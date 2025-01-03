@@ -2,7 +2,6 @@ import { EntityEnums } from "@shared/enums";
 import { IEntity } from "@shared/types";
 import { Button, ButtonGroup } from "components";
 import { EntityTag } from "components/advanced";
-import memoize from "memoize-one";
 import React from "react";
 import { FaLink, FaPlusSquare } from "react-icons/fa";
 import { areEqual } from "react-window";
@@ -15,30 +14,12 @@ import {
   StyledTagWrapper,
 } from "../SuggesterStyles";
 
-export const createItemData = memoize(
-  (
-    items,
-    onPick,
-    selected,
-    isInsideTemplate,
-    territoryParentId,
-    disableButtons
-  ): SuggestionRowEntityItemData => ({
-    items,
-    onPick,
-    selected,
-    isInsideTemplate,
-    territoryParentId,
-    disableButtons,
-  })
-);
-
 export type SuggestionRowEntityItemData = {
   items: EntitySuggestion[];
   onPick: (entity: IEntity, duplicate?: boolean) => void;
   selected: number;
   isInsideTemplate: boolean;
-  territoryParentId: string;
+  territoryParentId: string | undefined;
   disableButtons: boolean;
 };
 

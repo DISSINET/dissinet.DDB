@@ -237,14 +237,15 @@ export const Suggester: React.FC<Suggester> = ({
   };
 
   const renderEntitySuggestions = (suggestions: EntitySuggestion[]) => {
-    const itemData: SuggestionRowEntityItemData = createItemData(
-      suggestions as EntitySuggestion[],
+    const itemData: SuggestionRowEntityItemData = {
+      items: suggestions,
       onPick,
       selected,
       isInsideTemplate,
       territoryParentId,
-      disableButtons
-    );
+      disableButtons,
+    };
+
     const rowHeight = 25;
     return (
       <List
