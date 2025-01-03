@@ -1,5 +1,5 @@
 import { EntityEnums } from "@shared/enums";
-import { IEntity, RequestSearch } from "@shared/types";
+import { IConcept, IEntity, ITerritory, RequestSearch } from "@shared/types";
 import { regExpEscape } from "@common/functions";
 import Entity from "./entity";
 import Statement from "@models/statement/statement";
@@ -10,6 +10,11 @@ import { IRequest } from "src/custom_typings/request";
 import Territory from "@models/territory/territory";
 import Audit from "@models/audit/audit";
 import Document from "@models/document/document";
+import treeCache from "@service/treeCache";
+import { getEntitiesByIds } from "@service/shorthands";
+import entity from "./entity";
+import Classification from "@models/relation/classification";
+import { PropSpecKind } from "@shared/types/prop";
 
 /**
  * SearchQuery is customized builder for search queries, allowing to build query by chaining prepared filters
@@ -468,6 +473,45 @@ export class ResponseSearch {
     const query = new SearchQuery(httpRequest.db.connection);
     await query.fromRequest(this.request);
     let entities = await query.do();
+
+    // Handling this search condition here while it is reusing the entity method
+    if (this.request.isRootInvalid === true) {
+      const rootT = treeCache.tree.getRootTerritory() as ITerritory;
+      const conn = httpRequest.db.connection;
+
+      const entitiesToCheck = [...entities];
+      entities = [];
+
+      for (const entity of entitiesToCheck) {
+        const classificationRels =
+          await Classification.getClassificationForwardConnections(
+            conn,
+            entity.id,
+            entity.class,
+            1,
+            0
+          );
+        const classificationEs: IConcept[] = await getEntitiesByIds<IConcept>(
+          conn,
+          classificationRels.map((c) => c.entityIds[1])
+        );
+        const propValueEs = await getEntitiesByIds<IEntity>(
+          conn,
+          Entity.extractIdsFromProps(entity.props, [PropSpecKind.VALUE])
+        );
+
+        const entityModel = new Entity(entity);
+
+        const warnings = entityModel.getTBasedWarnings(
+          [rootT],
+          classificationEs,
+          propValueEs
+        );
+        if (warnings.length > 0) {
+          entities.push(entity);
+        }
+      }
+    }
 
     if (query.retainedIdsOrder) {
       entities = sortByRequiredOrder(entities, query.retainedIdsOrder);

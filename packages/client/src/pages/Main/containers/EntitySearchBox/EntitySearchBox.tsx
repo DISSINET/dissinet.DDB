@@ -7,7 +7,7 @@ import { IRequestSearch } from "@shared/types/request-search";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { wildCardChar } from "Theme/constants";
 import api from "api";
-import { Button, Input, Loader, TypeBar } from "components";
+import { Button, Checkbox, Input, Loader, Tooltip, TypeBar } from "components";
 import Dropdown, {
   AttributeButtonGroup,
   EntityCreateModal,
@@ -109,8 +109,9 @@ export const EntitySearchBox: React.FC = () => {
     data: entities,
     error,
     isFetching,
+    isPending,
   } = useQuery({
-    queryKey: ["search", debouncedValues],
+    queryKey: ["search", { searchData: JSON.stringify(debouncedValues) }],
     queryFn: async () => {
       if (debouncedValues.usedTemplate === "Any") {
         const { usedTemplate, ...filters } = debouncedValues;
@@ -163,6 +164,10 @@ export const EntitySearchBox: React.FC = () => {
         delete changes[changeKey];
       }
     });
+
+    if (changes.isRootInvalid === false) {
+      delete newSearch.isRootInvalid;
+    }
 
     setSearchData(newSearch);
   };
@@ -574,6 +579,30 @@ export const EntitySearchBox: React.FC = () => {
                     }}
                   />
                 )}
+              </StyledRow>
+              <StyledRow>
+                <StyledRowHeader>Root T validity</StyledRowHeader>
+
+                <AttributeButtonGroup
+                  options={[
+                    {
+                      longValue: "All",
+                      shortValue: "All",
+                      onClick: () => {
+                        handleChange({ isRootInvalid: undefined });
+                      },
+                      selected: !searchData.isRootInvalid,
+                    },
+                    {
+                      longValue: "Only Invalid",
+                      shortValue: "Only Invalid",
+                      onClick: () => {
+                        handleChange({ isRootInvalid: true });
+                      },
+                      selected: searchData.isRootInvalid === true,
+                    },
+                  ]}
+                />
               </StyledRow>
             </>
           )}

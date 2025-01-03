@@ -406,7 +406,6 @@ export default class Entity implements IEntity, IDbModel {
 
       const languageCheck =
         !entityLanguages?.length || entityLanguages.includes(this.language);
-      console.log("language", this.language, entityLanguages, languageCheck);
 
       const statusCheck =
         !entityStatuses?.length || entityStatuses.includes(this.status);

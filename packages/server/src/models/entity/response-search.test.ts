@@ -108,13 +108,13 @@ describe("models/response-search", function () {
     const rand = Math.random().toString();
 
     const [, nameEntity] = prepareEntity();
-    nameEntity.label = "Evelín Teměř Jr.";
-    nameEntity.id = `${nameEntity.label}-${nameEntity.id}`;
+    nameEntity.labels[0] = "Evelín Teměř Jr.";
+    nameEntity.id = `${nameEntity.labels[0]}-${nameEntity.id}`;
     nameEntity.class = EntityEnums.Class.Person;
 
     const [, eventEntity] = prepareEntity();
-    eventEntity.label = "TRP yyyy-mm-dd: during";
-    eventEntity.id = `${eventEntity.label}-${eventEntity.id}`;
+    eventEntity.labels[0] = "TRP yyyy-mm-dd: during";
+    eventEntity.id = `${eventEntity.labels[0]}-${eventEntity.id}`;
     eventEntity.class = EntityEnums.Class.Event;
 
     beforeAll(async () => {
@@ -132,7 +132,7 @@ describe("models/response-search", function () {
 
     describe("search by word", () => {
       it("should return found result when searching word by word", async () => {
-        const words = eventEntity.label
+        const words = eventEntity.labels[0]
           .replace(/[^a-zA-Z0-9]+/g, " ")
           .split(" ")
           .map((w) => w.trim());
@@ -178,22 +178,22 @@ describe("models/response-search", function () {
 
   describe("test sorting", function () {
     const entitites: IEntity[] = [
-      new Entity({ id: "1", label: "one" }),
-      new Entity({ id: "2", label: "three" }),
-      new Entity({ id: "3", label: "one hundred and six" }),
-      new Entity({ id: "4", label: "five" }),
-      new Entity({ id: "5", label: "six" }),
-      new Entity({ id: "6", label: "seven" }),
-      new Entity({ id: "7", label: "eight" }),
-      new Entity({ id: "8", label: "eleven" }),
-      new Entity({ id: "9", label: "twenty-one" }),
-      new Entity({ id: "10", label: "onehundred" }),
+      new Entity({ id: "1", labels: ["one"] }),
+      new Entity({ id: "2", labels: ["three"] }),
+      new Entity({ id: "3", labels: ["one hundred and six"] }),
+      new Entity({ id: "4", labels: ["five"] }),
+      new Entity({ id: "5", labels: ["six"] }),
+      new Entity({ id: "6", labels: ["seven"] }),
+      new Entity({ id: "7", labels: ["eight"] }),
+      new Entity({ id: "8", labels: ["eleven"] }),
+      new Entity({ id: "9", labels: ["twenty-one"] }),
+      new Entity({ id: "10", labels: ["onehundred"] }),
     ];
 
     describe("sortByLength", () => {
       it("should return entities in expected order", function () {
         const sorted = sortByLength(entitites);
-        const sortedLabels = sorted.map((e) => e.label);
+        const sortedLabels = sorted.map((e) => e.labels[0]);
         const expectedSortedLabels = [
           "one",
           "six",
@@ -214,8 +214,8 @@ describe("models/response-search", function () {
     describe("sortByWordMatch without label", () => {
       it("should return entities in unchanged order", function () {
         const sorted = sortByWordMatch(entitites, "");
-        const sortedLabels = sorted.map((e) => e.label);
-        const expectedSortedLabels = entitites.map((e) => e.label);
+        const sortedLabels = sorted.map((e) => e.labels[0]);
+        const expectedSortedLabels = entitites.map((e) => e.labels[0]);
 
         expect(sortedLabels).toEqual(expectedSortedLabels);
       });
@@ -223,7 +223,7 @@ describe("models/response-search", function () {
 
     describe("sortByWordMatch with label matching more entities", () => {
       const sorted = sortByWordMatch(entitites, "one");
-      const sortedLabels = sorted.map((e) => e.label);
+      const sortedLabels = sorted.map((e) => e.labels[0]);
 
       it("should return first entity to be the one with exact match and smallest length", function () {
         expect(sortedLabels[0]).toEqual("one");
