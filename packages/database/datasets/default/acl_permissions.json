@@ -258,6 +258,18 @@
     "roles": ["*"]
   },
   {
+    "controller":"documents",
+    "route": ":documentId/removeAnchors",
+    "method": "PATCH",
+    "roles": ["admin"]
+  },
+  {
+    "controller":"documents",
+    "route": ":documentId/removeAnchor",
+    "method": "PATCH",
+    "roles": ["admin"]
+  },
+  {
     "controller": "settings",
     "route": ":key",
     "method": "GET",

@@ -387,4 +387,46 @@ export default Router()
         };
       }
     )
+  )
+  .patch(
+    "/:documentId/removeAnchor",
+    asyncRouteHandler<IResponseGeneric<any>>(
+      async (
+        request: IRequest<
+          { documentId: string },
+          { entityId: string; anchorText: string; anchorIndex: number }
+        >
+      ) => {
+        const id = request.params.documentId;
+        if (!id) {
+          throw new BadParams("document id has to be set");
+        }
+
+        const { entityId, anchorText, anchorIndex } = request.body;
+        if (!entityId || anchorIndex < 0) {
+          throw new BadParams("entiyId and anchorIndex has to be set");
+        }
+
+        await request.db.lock();
+
+        const existing = await Document.getDocumentById(
+          request.db.connection,
+          id
+        );
+        if (!existing) {
+          throw DocumentDoesNotExist.forId(id);
+        }
+
+        existing.removeAnchor(entityId, anchorIndex);
+        existing.entityIds = existing.findEntities();
+        const result = await existing.update(request.db.connection, {
+          content: existing.content,
+          entityIds: existing.entityIds,
+        });
+
+        return {
+          result: !!result.replaced,
+        };
+      }
+    )
   );

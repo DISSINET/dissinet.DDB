@@ -1267,7 +1267,7 @@ class Api {
     try {
       const response = await this.connection.patch(
         `/documents/${documentId}/removeAnchors?entityId=${entityId}`,
-        document,
+        undefined,
         options
       );
       return response;
@@ -1284,10 +1284,16 @@ class Api {
     options?: IApiOptions
   ): Promise<AxiosResponse<IResponseGeneric>> {
     try {
-      // todo add api endpoint
-
-      // @ts-ignore
-      return null;
+      const response = await this.connection.patch(
+        `/documents/${documentId}/removeAnchor`,
+        {
+          entityId,
+          anchorText,
+          anchorIndex,
+        },
+        options
+      );
+      return response;
     } catch (err) {
       throw this.handleError(err);
     }

@@ -314,6 +314,46 @@ export default class Document implements IDocument, IDbModel {
     }
   }
 
+  removeAnchor(entityId: string, index: number) {
+    const tagRegex = new RegExp(`<\\/?${entityId}(>|$)`, "g");
+    let match;
+    let count = 0;
+    let positions: { start: number; end: number }[] = [];
+
+    // Find all matching tags in the content
+    while ((match = tagRegex.exec(this.content)) !== null) {
+      if (match[0] === `<${entityId}>`) {
+        // Start tag position
+        positions.push({ start: match.index, end: -1 });
+      } else if (match[0] === `</${entityId}>`) {
+        // End tag position
+        if (
+          positions.length > 0 &&
+          positions[positions.length - 1].end === -1
+        ) {
+          positions[positions.length - 1].end = match.index + match[0].length;
+          count++;
+        }
+      }
+    }
+
+    // Out of bounds
+    if (index < 0 || index >= positions.length) {
+      return;
+    }
+
+    const targetTag = positions[index];
+    if (targetTag.start !== -1 && targetTag.end !== -1) {
+      this.content =
+        this.content.slice(0, targetTag.start) +
+        this.content.slice(
+          targetTag.start + `<${entityId}>`.length,
+          targetTag.end - `</${entityId}>`.length
+        ) +
+        this.content.slice(targetTag.end);
+    }
+  }
+
   /**
    * search for single document by ids
    * @param db Connection database connection
