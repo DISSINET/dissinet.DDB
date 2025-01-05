@@ -119,7 +119,7 @@ export default class Keys {
           };
         }
       } else {
-        this.cursor.manualDirection = DIRECTION.BACKWARD;
+        this.cursor.selectDirection = DIRECTION.BACKWARD;
         this.cursor.selectEnd = this.cursor.selectStart;
         this.cursor.selectStart = {
           xLine: originalXLine,
@@ -147,16 +147,17 @@ export default class Keys {
   }) {
     // default delta to the left
     let offsetLeft = -1;
-    this.cursor.manualDirection = DIRECTION.BACKWARD;
+
     const originalXLine = this.cursor.xLine;
     const originalYline = this.cursor.yLine;
 
-    if (this.cursor.selectStart) {
+    /* if (this.cursor.selectStart) {
       // if already selected text (dblclick), reuse selectStart position as cursor's position
       this.cursor.xLine = this.cursor.selectStart.xLine;
       this.cursor.yLine =
         this.cursor.selectStart.yLine - this.viewport.lineStart;
     }
+*/
 
     if (ctrlKey) {
       // ctrl key used - find last word to the left
@@ -197,16 +198,25 @@ export default class Keys {
     }
 
     if (shiftKey) {
-      // copy cursor's current position as selectStart
-      this.cursor.selectStart = {
-        xLine: this.cursor.xLine,
-        yLine: this.viewport.lineStart + this.cursor.yLine,
-      };
-      // set selectEnd to cursor's original position as initialization
-      if (!this.cursor.selectEnd) {
+      if (this.cursor.selectDirection === DIRECTION.FORWARD) {
+        // copy cursor's current position as selectStart
         this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      } else if (this.cursor.selectDirection === DIRECTION.BACKWARD) {
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      } else {
+        this.cursor.selectStart = {
           xLine: originalXLine,
-          yLine: this.viewport.lineStart + originalYline,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
         };
       }
     } else {
@@ -222,6 +232,8 @@ export default class Keys {
       this.cursor.selectStart = undefined;
       this.cursor.selectEnd = undefined;
     }
+
+    this.cursor.setTrueSelectionDirection();
   }
 
   onArrowRight({
@@ -233,7 +245,9 @@ export default class Keys {
   }) {
     // default delta to the right
     let offsetRight = 1;
-    this.cursor.manualDirection = DIRECTION.FORWARD;
+    if (!this.cursor.isSelected()) {
+      this.cursor.selectDirection = DIRECTION.FORWARD;
+    }
     const originalXLine = this.cursor.xLine;
     const originalYline = this.cursor.yLine;
 
@@ -295,16 +309,24 @@ export default class Keys {
     }
 
     if (shiftKey) {
-      // copy cursor's current position as selectStart
-      this.cursor.selectEnd = {
-        xLine: this.cursor.xLine,
-        yLine: this.viewport.lineStart + this.cursor.yLine,
-      };
-      // set selectStart to cursor's original position as initialization
-      if (!this.cursor.selectStart) {
+      if (this.cursor.selectDirection === DIRECTION.FORWARD) {
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      } else if (this.cursor.selectDirection === DIRECTION.BACKWARD) {
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      } else {
         this.cursor.selectStart = {
           xLine: originalXLine,
-          yLine: this.viewport.lineStart + originalYline,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
         };
       }
     } else {
@@ -320,6 +342,8 @@ export default class Keys {
       this.cursor.selectStart = undefined;
       this.cursor.selectEnd = undefined;
     }
+
+    this.cursor.setTrueSelectionDirection();
   }
   /**
    * onKeyDown is handler for pressed key event
@@ -389,7 +413,7 @@ export default class Keys {
               };
             }
           } else {
-            this.cursor.manualDirection = DIRECTION.FORWARD;
+            this.cursor.selectDirection = DIRECTION.FORWARD;
             this.cursor.selectStart = this.cursor.selectEnd;
             this.cursor.selectEnd = {
               xLine: this.cursor.xLine,
