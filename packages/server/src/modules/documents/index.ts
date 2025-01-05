@@ -418,7 +418,7 @@ export default Router()
         }
 
         existing.removeAnchor(entityId, anchorIndex);
-
+        existing.entityIds = existing.findEntities();
         const result = await existing.update(request.db.connection, {
           content: existing.content,
           entityIds: existing.entityIds,
