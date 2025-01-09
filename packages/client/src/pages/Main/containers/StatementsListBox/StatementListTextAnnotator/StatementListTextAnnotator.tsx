@@ -395,6 +395,9 @@ export const StatementListTextAnnotator: React.FC<
           <Dropdown.Multi.Entity
             options={entitiesDict}
             disableEmpty={true}
+
+            isClearable={true}a
+
             disableAny={true}
             onChange={handleHlEntitiesChange}
             value={hlEntities}

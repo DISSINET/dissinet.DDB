@@ -32,6 +32,8 @@ interface EntityMultiDropdown<T = string> {
   disableTyping?: boolean;
   disabled?: boolean;
 
+  isClearable?: boolean;
+
   loggerId?: string;
 }
 export const EntityMultiDropdown = <T extends string>({
@@ -46,6 +48,8 @@ export const EntityMultiDropdown = <T extends string>({
   disableEmpty = false,
   disableTyping = false,
   disabled,
+
+  isClearable = true,
 
   loggerId,
 }: EntityMultiDropdown<T>) => {
@@ -64,6 +68,7 @@ export const EntityMultiDropdown = <T extends string>({
       entityDropdown
       width={width}
       isMulti
+      isClearable={isClearable}
       options={[...generalValues, ...options]}
       value={generalValues
         .concat(options)
