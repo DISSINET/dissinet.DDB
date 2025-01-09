@@ -12,7 +12,7 @@ interface annotatorHighlightData {
 export const annotatorHighlight = (
   entityId: string,
   data: annotatorHighlightData,
-  hlEntities: EntityEnums.Class[],
+  hlClasses: EntityEnums.Class[],
   theme: DefaultTheme | undefined
 ): HighlightSchema | undefined => {
   const dReferenceEntityIds: Record<EntityEnums.Class, string[]> =
@@ -34,8 +34,8 @@ export const annotatorHighlight = (
 
   if (
     entityClass &&
-    hlEntities &&
-    hlEntities.includes(entityClass as EntityEnums.Class)
+    hlClasses &&
+    hlClasses.includes(entityClass as EntityEnums.Class)
   ) {
     if (entityClass === EntityEnums.Class.Statement) {
       return {

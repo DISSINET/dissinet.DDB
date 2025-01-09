@@ -15,6 +15,7 @@ import {
   StyledAnnotatorItemContent,
   StyledAnnotatorItemTitle,
 } from "./AnnotatorStyles";
+import { toast } from "react-toastify";
 
 interface TextAnnotatorMenuProps {
   text: string;
@@ -60,6 +61,7 @@ export const TextAnnotatorMenu = ({
             color="primary"
             onClick={() => {
               navigator.clipboard.writeText(text);
+              toast.info("text copied to clipboard");
             }}
             label={"Copy text"}
             tooltipLabel="copy selected text into clipboard"

@@ -7,6 +7,7 @@ import { getShortLabelByLetterCount } from "utils/utils";
 import TextAnnotator from "../Annotator/Annotator";
 import AnnotatorProvider from "../Annotator/AnnotatorProvider";
 import { Annotator } from "@inkvisitor/annotator/src/lib";
+import { EntityEnums } from "@shared/enums";
 
 interface DocumentModalEdit {
   document: IResponseDocument | IDocumentMeta | IDocument | undefined;
@@ -45,15 +46,19 @@ const DocumentModalEdit: React.FC<DocumentModalEdit> = ({
               width={965}
               height={windowHeight - 180}
               displayLineNumbers={true}
-              hlEntities={[]}
+              hlEntities={[EntityEnums.Class.Territory]}
               storedAnnotatorScroll={0}
               forwardAnnotator={(newAnnotator) => {
                 // if (!annotatorInitialized && newAnnotator && anchor?.entityId) {
                 anchor?.entityId &&
-                  newAnnotator?.scrollToAnchor(anchor?.entityId);
+                  newAnnotator?.scrollToAnchor(
+                    anchor?.entityId,
+                    anchor?.occurence || 1
+                  );
                 // setAnnotatorInitialized(true);
                 // }
               }}
+              thisTerritoryEntityId={anchor?.entityId}
             />
           </AnnotatorProvider>
         ) : (

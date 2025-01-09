@@ -1,5 +1,8 @@
 import { IDocumentMeta, IEntity } from "@shared/types";
-import { IResponseUsedInDocument } from "@shared/types/response-detail";
+import {
+  IResponseDetail,
+  IResponseUsedInDocument,
+} from "@shared/types/response-detail";
 import { useMutation } from "@tanstack/react-query";
 import api from "api";
 import { DocumentTitle, Table } from "components";
@@ -18,13 +21,13 @@ type CellType = CellProps<IResponseUsedInDocument>;
 interface EntityDetailUsedInDocumentsTable {
   title: { singular: string; plural: string };
   entities: { [key: string]: IEntity };
-  useCases: IResponseUsedInDocument[];
+  uses: IResponseUsedInDocument[];
   perPage?: number;
 }
 export const EntityDetailUsedInDocumentsTable: React.FC<
   EntityDetailUsedInDocumentsTable
-> = ({ title, entities, useCases = [], perPage }) => {
-  const data = useMemo(() => useCases, [useCases]);
+> = ({ title, entities, uses = [], perPage, entity }) => {
+  const data = useMemo(() => uses, [uses]);
 
   const removeAnchorMutation = useMutation({
     mutationFn: (data: { documentId: string; entityId: string }) =>
@@ -35,7 +38,8 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
   const [openedDocument, setOpenedDocument] = useState<IDocumentMeta | false>(
     false
   );
-  const [tempAnchor, setTempAnchor] = useState<string | false>(false);
+  const [tAnchor, setTAnchor] = useState<string | false>(false);
+  const [entityOcc, setEntityOcc] = useState<number | false>(false);
 
   const columns = useMemo<Column<IResponseUsedInDocument>[]>(
     () => [
@@ -91,7 +95,7 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
                   entity={territoryEntity}
                   unlinkButton={{
                     onClick: () => {
-                      setTempAnchor(territoryEntity.id);
+                      setTAnchor(territoryEntity.id);
                       setOpenedDocument(row.original.document);
                     },
                     icon: <FaAnchor />,
@@ -141,9 +145,10 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
           document={openedDocument}
           onClose={() => {
             setOpenedDocument(false);
-            setTempAnchor(false);
+            setTAnchor(false);
+            setEntityOcc(false);
           }}
-          anchor={tempAnchor ? { entityId: tempAnchor } : undefined}
+          anchor={tAnchor ? { entityId: tAnchor } : undefined}
         />
       )}
     </>
