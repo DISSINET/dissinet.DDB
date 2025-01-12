@@ -78,12 +78,6 @@ export default class Keys {
     const originalXLine = this.cursor.xLine;
     const originalYline = this.cursor.yLine;
 
-    if (this.cursor.selectEnd && this.cursor.selectStart) {
-      this.cursor.xLine = this.cursor.selectStart.xLine;
-      this.cursor.yLine =
-        this.cursor.selectStart.yLine - this.viewport.lineStart;
-    }
-
     if (this.cursor.yLine <= 0) {
       // scroll up if going outside of the viewport
       this.viewport.scrollTo(this.viewport.lineStart - 1, this.text.noLines);
@@ -99,43 +93,109 @@ export default class Keys {
       this.cursor.move(0, -1);
     }
 
-    const currentLine =
-      this.text.getCurrentLine(this.viewport, this.cursor) || "";
-    if (currentLine.length < this.cursor.xLine) {
-      this.cursor.xLine = 0;
+    // cursor should not go being line bounds (right side)
+    const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
+    if (line.length < this.cursor.xLine) {
+      this.cursor.xLine = line.length;
     }
 
     if (shiftKey) {
-      const direction = this.cursor.getSelectionDirection();
-      if (direction === DIRECTION.BACKWARD) {
-        this.cursor.selectStart = {
+      if (this.cursor.selectDirection === DIRECTION.FORWARD) {
+        // copy cursor's current position as selectEnd - going forward & using up arrow key => reduce area
+        this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
         };
-        if (!this.cursor.selectEnd) {
-          this.cursor.selectStart = {
-            xLine: originalXLine,
-            yLine: this.viewport.lineStart + originalYline,
-          };
-        }
-      } else {
-        this.cursor.selectDirection = DIRECTION.BACKWARD;
-        this.cursor.selectEnd = this.cursor.selectStart;
-        this.cursor.selectStart = {
-          xLine: originalXLine,
+      } else if (this.cursor.selectDirection === DIRECTION.BACKWARD) {
+        // copy cursor's current position as selectEnd - going forward & using up arrow key => increase area
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
         };
-        if (!this.cursor.selectEnd) {
-          this.cursor.selectEnd = {
-            xLine: originalXLine,
-            yLine: this.viewport.lineStart + originalYline,
-          };
-        }
+      } else {
+        // select area not used yet - using up arrow:
+        // - start = original cursor position
+        // - end = current cursor position
+        this.cursor.selectStart = {
+          xLine: originalXLine, // use original without alteration!
+          yLine: this.viewport.lineStart + originalYline,
+        };
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
       }
     } else {
       this.cursor.selectStart = undefined;
       this.cursor.selectEnd = undefined;
     }
+
+    this.cursor.setTrueSelectionDirection();
+  }
+
+  onArrowDown({
+    ctrlKey,
+    shiftKey,
+  }: {
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+  }) {
+    const originalXLine = this.cursor.xLine;
+    const originalYline = this.cursor.yLine;
+
+    this.cursor.move(0, 1);
+
+    // if yLine is out of viewport => scroll down
+    if (this.cursor.yLine + this.viewport.lineStart > this.viewport.lineEnd) {
+      this.viewport.scrollTo(this.viewport.lineStart + 1, this.text.noLines);
+      this.cursor.yLine = this.viewport.lineEnd - this.viewport.lineStart;
+    }
+
+    const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
+
+    // if out of lines - use last line's setup (last x char)
+    if (this.cursor.yLine + this.viewport.lineStart >= this.text.noLines) {
+      this.cursor.yLine = this.text.noLines - this.viewport.lineStart - 1;
+      this.cursor.xLine = line.length;
+    }
+
+    // cursor should not go being line bounds (right side)
+    if (line.length < this.cursor.xLine) {
+      this.cursor.xLine = line.length;
+    }
+
+    if (shiftKey) {
+      if (this.cursor.selectDirection === DIRECTION.FORWARD) {
+        // copy cursor's current position as selectEnd - going forward & using down arrow key => increase area
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      } else if (this.cursor.selectDirection === DIRECTION.BACKWARD) {
+        // copy cursor's current position as selectEnd - going backward & using down arrow key => reduce area
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      } else {
+        // select area not used yet - using down arrow:
+        // - start = original cursor position
+        // - end = current cursor position
+        this.cursor.selectStart = {
+          xLine: originalXLine, // use original without alteration!
+          yLine: this.viewport.lineStart + originalYline,
+        };
+        this.cursor.selectEnd = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      }
+    } else {
+      this.cursor.selectStart = undefined;
+      this.cursor.selectEnd = undefined;
+    }
+
+    this.cursor.setTrueSelectionDirection();
   }
 
   onArrowLeft({
@@ -149,15 +209,6 @@ export default class Keys {
     let offsetLeft = -1;
 
     const originalXLine = this.cursor.xLine;
-    const originalYline = this.cursor.yLine;
-
-    /* if (this.cursor.selectStart) {
-      // if already selected text (dblclick), reuse selectStart position as cursor's position
-      this.cursor.xLine = this.cursor.selectStart.xLine;
-      this.cursor.yLine =
-        this.cursor.selectStart.yLine - this.viewport.lineStart;
-    }
-*/
 
     if (ctrlKey) {
       // ctrl key used - find last word to the left
@@ -186,12 +237,6 @@ export default class Keys {
         this.cursor.yLine = Math.max(0, this.cursor.yLine - 1);
         const line = this.text.getCurrentLine(this.viewport, this.cursor);
         this.cursor.xLine = line?.length || 0;
-
-        if (this.cursor.selectStart) {
-          this.cursor.selectStart.xLine = this.cursor.xLine;
-          this.cursor.selectStart.yLine =
-            this.viewport.lineStart + this.cursor.yLine;
-        }
       }
     } else {
       this.cursor.move(offsetLeft, 0);
@@ -199,17 +244,21 @@ export default class Keys {
 
     if (shiftKey) {
       if (this.cursor.selectDirection === DIRECTION.FORWARD) {
-        // copy cursor's current position as selectStart
+        // copy cursor's current position as selectEnd - going forward & using left arrow key => reduce area
         this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
         };
       } else if (this.cursor.selectDirection === DIRECTION.BACKWARD) {
+        // copy cursor's current position as selectEnd - going backward & using left arrow key => increase area
         this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
         };
       } else {
+        // select area not used yet - using left arrow:
+        // - start = original cursor position
+        // - end = current cursor position
         this.cursor.selectStart = {
           xLine: originalXLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
@@ -245,17 +294,8 @@ export default class Keys {
   }) {
     // default delta to the right
     let offsetRight = 1;
-    if (!this.cursor.isSelected()) {
-      this.cursor.selectDirection = DIRECTION.FORWARD;
-    }
-    const originalXLine = this.cursor.xLine;
-    const originalYline = this.cursor.yLine;
 
-    if (this.cursor.selectEnd) {
-      // if already selected text (dblclick), reuse selectEnd position as cursor's position
-      this.cursor.xLine = this.cursor.selectEnd.xLine;
-      this.cursor.yLine = this.cursor.selectEnd.yLine - this.viewport.lineStart;
-    }
+    const originalXLine = this.cursor.xLine;
 
     if (ctrlKey) {
       // ctrl key used - find next word to the right
@@ -292,12 +332,11 @@ export default class Keys {
     this.cursor.move(offsetRight, 0);
 
     // check if we are at the end of the line -> move to next line
-    const currentLine =
-      this.text.getCurrentLine(this.viewport, this.cursor) || "";
+    const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
     let backupXLine = this.cursor.xLine;
     let backupYLine = this.cursor.yLine;
 
-    if (currentLine.length < this.cursor.xLine) {
+    if (line.length < this.cursor.xLine) {
       this.cursor.xLine = 0;
       this.cursor.yLine++;
     }
@@ -310,16 +349,21 @@ export default class Keys {
 
     if (shiftKey) {
       if (this.cursor.selectDirection === DIRECTION.FORWARD) {
+        // copy cursor's current position as selectEnd - going forward & using right arrow key => increase area
         this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
         };
       } else if (this.cursor.selectDirection === DIRECTION.BACKWARD) {
+        // copy cursor's current position as selectEnd - going backward & using right arrow key => reduce area
         this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
         };
       } else {
+        // select area not used yet - using right arrow:
+        // - start = original cursor position
+        // - end = current cursor position
         this.cursor.selectStart = {
           xLine: originalXLine,
           yLine: this.viewport.lineStart + this.cursor.yLine,
@@ -371,72 +415,7 @@ export default class Keys {
       }
 
       case Key.ArrowDown: {
-        const originalXLine = this.cursor.xLine;
-        const originalYline = this.cursor.yLine;
-
-        if (this.cursor.selectStart && this.cursor.selectEnd) {
-          this.cursor.xLine = this.cursor.selectEnd.xLine;
-          this.cursor.yLine =
-            this.cursor.selectEnd.yLine - this.viewport.lineStart;
-        }
-
-        this.cursor.move(0, 1);
-        if (
-          this.cursor.yLine >
-          this.viewport.lineEnd - this.viewport.lineStart
-        ) {
-          this.viewport.scrollTo(
-            this.viewport.lineStart + 1,
-            this.text.noLines
-          );
-          this.cursor.yLine = this.viewport.lineEnd - this.viewport.lineStart;
-        }
-        if (this.cursor.yLine + this.viewport.lineStart >= this.text.noLines) {
-          this.cursor.yLine = this.text.noLines - this.viewport.lineStart - 1;
-          const line =
-            this.text.getCurrentLine(this.viewport, this.cursor) || "";
-          this.cursor.xLine = line.length;
-        }
-
-        if (e.shiftKey) {
-          const direction = this.cursor.getSelectionDirection();
-          if (direction === DIRECTION.FORWARD) {
-            this.cursor.selectEnd = {
-              xLine: this.cursor.xLine,
-              yLine: this.viewport.lineStart + this.cursor.yLine,
-            };
-            // set selectEnd to cursor's original position as initialization
-            if (!this.cursor.selectStart) {
-              this.cursor.selectStart = {
-                xLine: originalXLine,
-                yLine: this.viewport.lineStart + originalYline,
-              };
-            }
-          } else {
-            this.cursor.selectDirection = DIRECTION.FORWARD;
-            this.cursor.selectStart = this.cursor.selectEnd;
-            this.cursor.selectEnd = {
-              xLine: this.cursor.xLine,
-              yLine: this.viewport.lineStart + this.cursor.yLine,
-            };
-            if (!this.cursor.selectStart) {
-              this.cursor.selectStart = {
-                xLine: originalXLine,
-                yLine: this.viewport.lineStart + originalYline,
-              };
-            }
-          }
-
-          const line =
-            this.text.getCurrentLine(this.viewport, this.cursor) || "";
-          if (line.length < this.cursor.selectEnd.xLine) {
-            this.cursor.selectEnd.xLine = line.length;
-          }
-        } else {
-          this.cursor.selectStart = undefined;
-          this.cursor.selectEnd = undefined;
-        }
-
+        this.onArrowDown(e);
         break;
       }
 
