@@ -23,7 +23,7 @@ export default class Cursor
   xLine: number;
   yLine: number;
 
-  manualDirection?: DIRECTION;
+  selectDirection?: DIRECTION;
 
   // highlighted area must use absolute coordinates - highlighted area stays in position while scrolling
   private selecting: boolean = false;
@@ -35,32 +35,43 @@ export default class Cursor
     this.style = { ...this.style, color: "black" };
   }
 
-  getTrueSelectionDirection(): DIRECTION | null {
+  setTrueSelectionDirection() {
     if (this.selectStart && this.selectEnd) {
       if (this.selectStart.yLine < this.selectEnd.yLine) {
         // start is above end
-        return DIRECTION.FORWARD;
+        this.selectDirection = DIRECTION.FORWARD;
+        console.log("setting forward");
+        return;
       } else if (this.selectStart.yLine > this.selectEnd.yLine) {
         // start is below end
-        return DIRECTION.BACKWARD;
+        this.selectDirection = DIRECTION.BACKWARD;
+        console.log("setting backward");
+        return;
       } else {
         // the same line
         if (this.selectStart.xLine < this.selectEnd.xLine) {
           // start is before end on horizontal axis
-          return DIRECTION.FORWARD;
+          this.selectDirection = DIRECTION.FORWARD;
+          console.log("setting forward");
+
+          return;
         } else if (this.selectStart.xLine > this.selectEnd.xLine) {
           // start is after end on horizontal axis
-          return DIRECTION.BACKWARD;
+          this.selectDirection = DIRECTION.BACKWARD;
+          console.log("setting backward");
+
+          return;
         }
       }
     }
 
-    return null;
+    this.selectDirection = undefined;
+    console.log("setting undefined");
   }
 
   getSelectionDirection(): DIRECTION | undefined {
     if (this.selectStart && this.selectEnd) {
-      return this.manualDirection;
+      return this.selectDirection;
     }
 
     return undefined;
@@ -147,6 +158,9 @@ export default class Cursor
     } else {
       this.selectEnd = { xLine: this.xLine, yLine: yOffset + this.yLine };
     }
+
+    // test direction from selectArea call
+    this.setTrueSelectionDirection();
   }
 
   /**
@@ -276,7 +290,7 @@ export default class Cursor
   getAbsolutePosition(viewport: Viewport): IAbsCoordinates {
     return {
       xLine: this.xLine,
-      yLine: this.yLine + viewport.lineStart
-    }
+      yLine: this.yLine + viewport.lineStart,
+    };
   }
 }
