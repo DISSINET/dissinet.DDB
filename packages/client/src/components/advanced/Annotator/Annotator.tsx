@@ -217,7 +217,7 @@ export const TextAnnotator = ({
       RATIO
     );
 
-    newAnnotator.fontColor = "black";
+    newAnnotator.fontColor = theme?.color.black;
     newAnnotator.bgColor = "transparent";
 
     newAnnotator.setSelectStyle("turquoise", 0.8);

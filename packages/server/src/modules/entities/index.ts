@@ -144,7 +144,10 @@ export default Router()
     asyncRouteHandler<IResponseEntity[]>(
       async (req: IRequest<unknown, unknown, IRequestSearch>) => {
         const search = new RequestSearch(req.query);
-        if (search.label && search.label.length < 2) {
+        if (
+          (search.label && search.label.length < 2) ||
+          (search.labelOrId && search.labelOrId.length < 2)
+        ) {
           return [];
         }
 

@@ -5,7 +5,6 @@ import { ThemeType } from "./theme";
 
 interface GlobalStyle {
   theme: ThemeType;
-  disableUserSelect?: boolean;
 }
 const GlobalStyle = createGlobalStyle<GlobalStyle>`
   html {
@@ -32,9 +31,8 @@ const GlobalStyle = createGlobalStyle<GlobalStyle>`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  *:not(input,textarea) {
-    user-select: ${({ disableUserSelect }) =>
-      disableUserSelect ? "none" : "auto"};
+  .no-select {
+    user-select: none;  
   }
   h1 {
     font-size: ${({ theme }) => theme.fontSize["4xl"]};

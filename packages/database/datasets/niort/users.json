@@ -24,7 +24,7 @@
     "id": "2",
     "name": "guest",
     "email": "guest@guest.com",
-    "password": "abc123",
+    "password": "guest123",
     "active": true,
     "verified": true,
     "options": {

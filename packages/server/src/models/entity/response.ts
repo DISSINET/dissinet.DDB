@@ -7,6 +7,7 @@ import {
   IResponseUsedInMetaProp,
   IResponseUsedInStatement,
   IStatement,
+  ITerritory,
   IWarning,
 } from "@shared/types";
 import Entity from "./entity";
@@ -29,6 +30,7 @@ import EntityWarnings from "./warnings";
 import Document, { TreeNode } from "@models/document/document";
 import Resource from "@models/resource/resource";
 import treeCache from "@service/treeCache";
+import Territory from "@models/territory/territory";
 
 export class ResponseEntity extends Entity implements IResponseEntity {
   // map of entity ids that should be populated in subsequent methods and used in fetching
@@ -198,13 +200,13 @@ export class ResponseEntityDetail
       ...(await entityWarnings.getTBasedWarnings(
         req.db.connection,
         this,
-        treeCache.tree.getRootTerritory()
+        treeCache.tree.getRootTerritory() as ITerritory
       )),
     ];
 
     // get all documents data in IResponseUsedInDocument format
     this.usedInDocuments = await this.findUsedInDocuments(conn);
-    this.usedInDocuments.forEach(ud => {
+    this.usedInDocuments.forEach((ud) => {
       this.addLinkedEntities(ud.parentTerritoryId);
       this.addLinkedEntities(ud.resourceId);
     });

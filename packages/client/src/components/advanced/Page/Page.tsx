@@ -12,7 +12,6 @@ import useKeypress from "hooks/useKeyPress";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Id, toast } from "react-toastify";
-import { setDisableUserSelect } from "redux/features/layout/disableUserSelectSlice";
 import { setPing } from "redux/features/pingSlice";
 import { setLastClickedIndex } from "redux/features/statementList/lastClickedIndexSlice";
 import { setUsername } from "redux/features/usernameSlice";
@@ -106,8 +105,8 @@ export const Page: React.FC<Page> = ({ children }) => {
 
   const [tempLocation, setTempLocation] = useState<string | false>(false);
 
-  useKeypress("Shift", () => dispatch(setDisableUserSelect(true)));
-  useKeyLift("Shift", () => dispatch(setDisableUserSelect(false)));
+  useKeypress("Shift", () => document.body.classList.add("no-select"));
+  useKeyLift("Shift", () => document.body.classList.remove("no-select"));
 
   useQuery({
     queryKey: ["ping"],

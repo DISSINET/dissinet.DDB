@@ -2,8 +2,10 @@ import React from "react";
 
 import { IEntity, IResponseDocument } from "@shared/types";
 import { Button } from "components/basic/Button/Button";
-import { BiSolidBookAdd, BiSolidMessageSquareAdd } from "react-icons/bi";
 import { BsSegmentedNav } from "react-icons/bs";
+import { FaClipboard, FaPlus } from "react-icons/fa";
+import { TbAnchor } from "react-icons/tb";
+import theme from "Theme/theme";
 import { classesAnnotator } from "types";
 import { EntitySuggester } from "../EntitySuggester/EntitySuggester";
 import { EntityTag } from "../EntityTag/EntityTag";
@@ -13,9 +15,7 @@ import {
   StyledAnnotatorItemContent,
   StyledAnnotatorItemTitle,
 } from "./AnnotatorStyles";
-import { TbAnchor } from "react-icons/tb";
-import { FaPlus } from "react-icons/fa";
-import theme from "Theme/theme";
+import { toast } from "react-toastify";
 
 interface TextAnnotatorMenuProps {
   text: string;
@@ -55,6 +55,16 @@ export const TextAnnotatorMenu = ({
             label={"Segment"}
             tooltipLabel="Segment selection into Statements"
             disabled
+          />
+          <Button
+            icon={<FaClipboard size={16} />}
+            color="primary"
+            onClick={() => {
+              navigator.clipboard.writeText(text);
+              toast.info("text copied to clipboard");
+            }}
+            label={"Copy text"}
+            tooltipLabel="copy selected text into clipboard"
           />
         </StyledAnnotatorItemContent>
       </StyledAnnotatorItem>
@@ -119,6 +129,7 @@ export const TextAnnotatorMenu = ({
               onAnchorAdd(newAnchorId);
             }}
             inputWidth={200}
+            openDetailOnCreate
           />
         </StyledAnnotatorItemContent>
       </StyledAnnotatorItem>

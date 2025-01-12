@@ -50,6 +50,7 @@ export const LeftHeader: React.FC<LeftHeader> = React.memo(
     const versionText = `v. ${packageJson.version}${
       env ? ` | ${env}` : ``
     } | built: ${process.env.BUILD_TIMESTAMP}`;
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -184,7 +185,7 @@ export const RightHeader: React.FC<RightHeader> = React.memo(
 
     const usernameLoaded = userName.length > 0;
 
-    const [showGlobalValidations, setShowGlobalValidations] = useState(true);
+    const [showGlobalValidations, setShowGlobalValidations] = useState(false);
 
     return (
       <>

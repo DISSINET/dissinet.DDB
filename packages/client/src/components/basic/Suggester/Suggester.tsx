@@ -237,14 +237,15 @@ export const Suggester: React.FC<Suggester> = ({
   };
 
   const renderEntitySuggestions = (suggestions: EntitySuggestion[]) => {
-    const itemData: SuggestionRowEntityItemData = createItemData(
-      suggestions as EntitySuggestion[],
+    const itemData: SuggestionRowEntityItemData = {
+      items: suggestions,
       onPick,
       selected,
       isInsideTemplate,
       territoryParentId,
-      disableButtons
-    );
+      disableButtons,
+    };
+
     const rowHeight = 25;
     return (
       <List
@@ -334,7 +335,7 @@ export const Suggester: React.FC<Suggester> = ({
                 setSelected(-1);
               }}
               onEnterPressFn={handleEnterPress}
-              autoFocus={categories.length === 1 || autoFocus}
+              autoFocus={categories.length === 1 && autoFocus}
               disabled={disabled}
             />
             {typed.length > 0 && (

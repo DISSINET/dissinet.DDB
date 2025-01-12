@@ -1,3 +1,4 @@
+import { partitivityDict, virtualityDict } from "@shared/dictionaries";
 import { IEntity, IProp } from "@shared/types";
 import { excludedSuggesterEntities } from "Theme/constants";
 import { AttributeIcon, Button } from "components";
@@ -15,7 +16,6 @@ import {
   StyledAttributesFlexRow,
   StyledTagGrid,
 } from "./PropGroupRowStyles";
-import { partitivityDict, virtualityDict } from "@shared/dictionaries";
 
 interface PropGroupRowValue {
   propValueEntity: IEntity;
@@ -145,7 +145,7 @@ export const PropGroupRowValue: React.FC<PropGroupRowValue> = ({
                 true
               );
             }}
-            autoFocus={prop.type.entityId !== ""}
+            // autoFocus={prop.type.entityId !== ""}
             placeholder="value"
             openDetailOnCreate={openDetailOnCreate}
             categoryTypes={classesPropValue}

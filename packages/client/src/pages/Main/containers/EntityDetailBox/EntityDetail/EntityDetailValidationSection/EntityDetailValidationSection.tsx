@@ -24,7 +24,9 @@ import { ValidationRule } from "components/advanced";
 const initValidation: ITerritoryValidation = {
   detail: "",
   entityClasses: [],
-  classifications: [],
+  entityClassifications: [],
+  entityLanguages: [],
+  entityStatuses: [],
   allowedEntities: [],
   allowedClasses: [],
   propType: [],
@@ -63,11 +65,14 @@ export const EntityDetailValidationSection: React.FC<
   );
 
   const initValidationRule = () => {
+    const newValidation = { ...initValidation };
+    newValidation.territoryId = entity.id;
+
     updateEntityMutation.mutate({
       data: {
         validations: validations
-          ? [...validations, initValidation]
-          : [initValidation],
+          ? [...validations, newValidation]
+          : [newValidation],
       },
     });
   };

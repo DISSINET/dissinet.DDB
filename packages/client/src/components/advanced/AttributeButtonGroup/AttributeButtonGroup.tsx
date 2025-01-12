@@ -23,6 +23,7 @@ interface AttributeButtonGroup {
 
   fullSizeDisabled?: boolean;
   disabledBtnsTooltip?: string;
+  canSelectMultiple?: boolean;
 }
 
 export const AttributeButtonGroup: React.FC<AttributeButtonGroup> = ({
@@ -32,6 +33,7 @@ export const AttributeButtonGroup: React.FC<AttributeButtonGroup> = ({
   paddingX = false,
   fullSizeDisabled = false,
   disabledBtnsTooltip,
+  canSelectMultiple = false,
 }) => {
   return (
     <StyledWrap>
@@ -86,11 +88,10 @@ export const AttributeButtonGroup: React.FC<AttributeButtonGroup> = ({
                 radiusLeft={firstInRow}
                 radiusRight={lastInRow}
                 onClick={() => {
-                  if (!option.selected && !disabled) {
+                  if ((!option.selected || canSelectMultiple) && !disabled) {
                     option.onClick();
                   }
                 }}
-                paddingX={paddingX}
               />
             );
           })}

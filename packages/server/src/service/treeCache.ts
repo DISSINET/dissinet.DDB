@@ -70,7 +70,7 @@ export class TreeCreator {
     const childsAreEmpty = !childs.find((ch) => !ch.empty);
 
     this.idMap[subtreeRoot.id] = {
-      territory: subtreeRoot,
+      territory: subtreeRoot as ITerritory,
       statementsCount: noOfStatements,
       lvl,
       children: childs,
@@ -122,12 +122,11 @@ export class TreeCreator {
     );
   }
 
-  static async countStatements(db: Connection): Promise<Record<string, number>> {
+  static async countStatements(
+    db: Connection
+  ): Promise<Record<string, number>> {
     const statements = (
-      await getEntitiesDataByClass<IStatement>(
-        db,
-        EntityEnums.Class.Statement
-      )
+      await getEntitiesDataByClass<IStatement>(db, EntityEnums.Class.Statement)
     ).filter((s) => s.data.territory && s.data.territory.territoryId);
     const statementsCountMap: Record<string, number> = {}; // key is territoryid
     for (const statement of statements) {
@@ -199,7 +198,7 @@ export class TreeCache {
         path: [],
         right: UserEnums.RoleMode.Read,
         statementsCount: 0,
-        territory: new Territory({}),
+        territory: new Territory({}) as ITerritory,
         empty: true,
       };
     }

@@ -1,4 +1,8 @@
-import { entitiesDictKeys } from "@shared/dictionaries/entity";
+import {
+  entityStatusDict,
+  entitiesDictKeys,
+  languageDict,
+} from "@shared/dictionaries";
 import { EntityEnums } from "@shared/enums";
 import { IEntity } from "@shared/types";
 import {
@@ -23,7 +27,9 @@ export const ValidationText: React.FC<ValidationText> = ({
   const {
     detail,
     entityClasses,
-    classifications,
+    entityClassifications,
+    entityLanguages,
+    entityStatuses,
     tieType,
     propType,
     allowedClasses,
@@ -58,6 +64,40 @@ export const ValidationText: React.FC<ValidationText> = ({
       });
     },
     [entities]
+  );
+
+  const renderEntityStatusList = useCallback(
+    (statusList: EntityEnums.Status[]) => {
+      return statusList.map((status, index) => {
+        const statusItem = entityStatusDict[status];
+
+        const last: boolean = index === statusList.length - 1;
+        return (
+          <span key={statusItem.value}>
+            <StyledSentenceEntity>{statusItem.label}</StyledSentenceEntity>
+            {!last && " or "}
+          </span>
+        );
+      });
+    },
+    [entitiesDictKeys]
+  );
+
+  const renderEntityLanguageList = useCallback(
+    (languageList: EntityEnums.Language[]) => {
+      return languageList.map((language, index) => {
+        const langItem = languageDict.find((lang) => lang.value === language);
+
+        const last: boolean = index === languageList.length - 1;
+        return (
+          <span key={langItem?.value}>
+            <StyledSentenceEntity>{langItem?.label}</StyledSentenceEntity>
+            {!last && " or "}
+          </span>
+        );
+      });
+    },
+    [entitiesDictKeys]
   );
 
   const renderEntityClassList = useCallback(
@@ -102,10 +142,22 @@ export const ValidationText: React.FC<ValidationText> = ({
         )}
       </>
 
-      {classifications.length > 0 && (
+      {entityClassifications && entityClassifications.length > 0 && (
         <>
           {` classified as `}
-          {renderEntityList(classifications)}
+          {renderEntityList(entityClassifications ?? [])}
+        </>
+      )}
+      {entityLanguages && entityLanguages.length > 0 && (
+        <>
+          {` with language `}
+          {renderEntityLanguageList(entityLanguages ?? [])}
+        </>
+      )}
+      {entityStatuses && entityStatuses.length > 0 && (
+        <>
+          {` with status `}
+          {renderEntityStatusList(entityStatuses ?? [])}
         </>
       )}
 

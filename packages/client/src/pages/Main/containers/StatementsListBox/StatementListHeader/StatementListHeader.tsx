@@ -24,7 +24,7 @@ import Dropdown, {
   TerritoryActionModal,
 } from "components/advanced";
 import { useSearchParams } from "hooks";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FaHighlighter, FaList, FaTrash } from "react-icons/fa";
 import {
   MdOutlineCheckBox,
@@ -367,6 +367,23 @@ export const StatementListHeader: React.FC<StatementListHeader> = ({
     useState<HTMLSpanElement | null>(null);
   const [showSubmit, setShowSubmit] = useState(false);
 
+  const BreadcrumbItems = useMemo(() => {
+    return (
+      <React.Fragment>
+        {selectedTerritoryPath?.map((territoryId: string, key: number) => {
+          return (
+            <React.Fragment key={key}>
+              <BreadcrumbItem territoryId={territoryId} />
+            </React.Fragment>
+          );
+        })}
+        <React.Fragment key="this-territory">
+          <BreadcrumbItem territoryId={territoryId} territoryData={territory} />
+        </React.Fragment>
+      </React.Fragment>
+    );
+  }, [selectedTerritoryPath.join(",")]);
+
   return (
     <>
       <Tooltip
@@ -376,22 +393,7 @@ export const StatementListHeader: React.FC<StatementListHeader> = ({
       />
 
       <StyledHeader>
-        <StyledHeaderBreadcrumbRow>
-          {selectedTerritoryPath &&
-            selectedTerritoryPath.map((territoryId: string, key: number) => {
-              return (
-                <React.Fragment key={key}>
-                  <BreadcrumbItem territoryId={territoryId} />
-                </React.Fragment>
-              );
-            })}
-          <React.Fragment key="this-territory">
-            <BreadcrumbItem
-              territoryId={territoryId}
-              territoryData={territory}
-            />
-          </React.Fragment>
-        </StyledHeaderBreadcrumbRow>
+        <StyledHeaderBreadcrumbRow>{BreadcrumbItems}</StyledHeaderBreadcrumbRow>
 
         <StyledHeaderRow>
           <span style={{ display: "grid", gridTemplateColumns: "auto auto" }}>

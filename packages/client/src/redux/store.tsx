@@ -16,7 +16,6 @@ import treeInitializeSlice from "./features/territoryTree/treeInitializeSlice";
 import usernameSlice from "./features/usernameSlice";
 import contentHeightSlice from "./features/layout/contentHeightSlice";
 import statementListOpenedSlice from "./features/layout/statementListOpenedSlice";
-import disableUserSelectSlice from "./features/layout/disableUserSelectSlice";
 import lastClickedIndexSlice from "./features/statementList/lastClickedIndexSlice";
 import disableStatementListScrollSlice from "./features/statementList/disableStatementListScrollSlice";
 import disableTreeScrollSlice from "./features/territoryTree/disableTreeScrollSlice";
@@ -63,7 +62,6 @@ const store: Store = configureStore({
       fourthPanelExpanded: fourthPanelExpandedSlice,
       fourthPanelBoxesOpened: fourthPanelBoxesOpenedSlice,
       statementListOpened: statementListOpenedSlice,
-      disableUserSelect: disableUserSelectSlice,
     }),
   },
 });

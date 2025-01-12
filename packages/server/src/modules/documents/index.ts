@@ -394,7 +394,7 @@ export default Router()
       async (
         request: IRequest<
           { documentId: string },
-          { entityId: string; anchorText: string; anchorIndex: number }
+          { entityId: string; anchorIndex: number }
         >
       ) => {
         const id = request.params.documentId;
@@ -402,7 +402,7 @@ export default Router()
           throw new BadParams("document id has to be set");
         }
 
-        const { entityId, anchorText, anchorIndex } = request.body;
+        const { entityId, anchorIndex } = request.body;
         if (!entityId || anchorIndex < 0) {
           throw new BadParams("entiyId and anchorIndex has to be set");
         }

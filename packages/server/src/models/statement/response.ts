@@ -230,7 +230,6 @@ export class ResponseStatement extends Statement implements IResponseStatement {
       }
     }
 
-    console.log(warnings);
     return warnings;
   }
 

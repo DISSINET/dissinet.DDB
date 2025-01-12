@@ -58,7 +58,7 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
-    modules: ["node_modules", "src"],
+    modules: ["src", "node_modules"],
     alias: {
       "@shared": path.resolve(__dirname, "../shared/"),
     },

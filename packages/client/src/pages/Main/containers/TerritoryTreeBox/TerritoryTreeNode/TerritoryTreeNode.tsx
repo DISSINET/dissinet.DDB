@@ -1,5 +1,5 @@
-import { animated, config, useSpring } from "@react-spring/web";
-import { UserEnums } from "@shared/enums";
+import { config, useSpring } from "@react-spring/web";
+import { EntityEnums, UserEnums } from "@shared/enums";
 import { ITerritory, IUser } from "@shared/types";
 import { IParentTerritory } from "@shared/types/territory";
 import {
@@ -9,10 +9,11 @@ import {
 } from "@tanstack/react-query";
 import { rootTerritoryId } from "Theme/constants";
 import api from "api";
-import { EntityTag } from "components/advanced";
+import { EntityDropzone, EntityTag } from "components/advanced";
 import { useSearchParams } from "hooks";
 import update from "immutability-helper";
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { setDisableTreeScroll } from "redux/features/territoryTree/disableTreeScrollSlice";
 import { setTreeInitialized } from "redux/features/territoryTree/treeInitializeSlice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
@@ -180,6 +181,20 @@ export const TerritoryTreeNode: React.FC<TerritoryTreeNode> = ({
     }
   }, [hasChildren, territoryId]);
 
+  const moveStatementsMutation = useMutation({
+    mutationFn: async (data: {
+      statements: string[];
+      newTerritoryId: string;
+    }) => await api.statementsBatchMove(data.statements, data.newTerritoryId),
+    onSuccess: (variables, data) => {
+      queryClient.invalidateQueries({ queryKey: ["territory"] });
+      queryClient.invalidateQueries({ queryKey: ["tree"] });
+      toast.info(`statement moved`);
+      // could be redirected to newTerritory
+      // setTerritoryId(data.newTerritoryId);
+    },
+  });
+
   return (
     <>
       <>
@@ -203,20 +218,34 @@ export const TerritoryTreeNode: React.FC<TerritoryTreeNode> = ({
                 right={right}
               />
             </StyledIconWrap>
-            <EntityTag
-              entity={territory}
-              parentId={parent.territoryId}
-              lvl={lvl}
-              isSelected={isSelected}
-              index={index}
-              fullWidth
-              moveFn={moveFn}
-              updateOrderFn={moveTerritoryMutation.mutate}
-              statementsCount={statementsCount}
-              isFavorited={isFavorited}
-              showOnly="label"
-              tooltipPosition="right"
-            />
+            <EntityDropzone
+              onSelected={(newSelectedId: string) => {
+                moveStatementsMutation.mutate({
+                  statements: [newSelectedId],
+                  newTerritoryId: territory.id,
+                });
+              }}
+              disableTemplatesAccept
+              categoryTypes={[EntityEnums.Class.Statement]}
+              disabled={right === UserEnums.RoleMode.Read}
+              // ideally statements in current T
+              // excludedActantIds={[territory.data]}
+            >
+              <EntityTag
+                entity={territory}
+                parentId={parent.territoryId}
+                lvl={lvl}
+                isSelected={isSelected}
+                index={index}
+                fullWidth
+                moveFn={moveFn}
+                updateOrderFn={moveTerritoryMutation.mutate}
+                statementsCount={statementsCount}
+                isFavorited={isFavorited}
+                showOnly="label"
+                tooltipPosition="right"
+              />
+            </EntityDropzone>
             <TerritoryTreeContextMenu
               territoryActant={territory}
               onMenuOpen={handleMenuOpen}

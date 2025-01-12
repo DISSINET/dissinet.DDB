@@ -1,13 +1,33 @@
+import { InterfaceEnums } from "@shared/enums";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import api from "api";
+import { Page } from "components/advanced";
+import { useDebounce } from "hooks";
+import { SearchParamsProvider } from "hooks/useSearchParamsContext";
+import { useWindowSize } from "hooks/useWindowSize";
+import {
+  AboutPage,
+  AclPage,
+  ActivatePage,
+  DocumentsPage,
+  LoginPage,
+  MainPage,
+  NotFoundPage,
+  PasswordResetPage,
+  UsersPage,
+} from "pages";
 import React, { useEffect, useMemo } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { setContentHeight } from "redux/features/layout/contentHeightSlice";
+import { setLayoutWidth } from "redux/features/layout/layoutWidthSlice";
+import { setPanelWidths } from "redux/features/layout/panelWidthsSlice";
+import { setSeparatorXPosition } from "redux/features/layout/separatorXPositionSlice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import { ThemeProvider } from "styled-components";
-
-import api from "api";
-import { useWindowSize } from "hooks/useWindowSize";
 import {
   heightHeader,
   percentPanelWidths,
@@ -18,29 +38,6 @@ import {
 import GlobalStyle from "Theme/global";
 import theme, { ThemeType } from "Theme/theme";
 import { darkTheme } from "Theme/theme-dark";
-import { Page } from "components/advanced";
-import { useDebounce } from "hooks";
-
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { setContentHeight } from "redux/features/layout/contentHeightSlice";
-import { setLayoutWidth } from "redux/features/layout/layoutWidthSlice";
-import { setPanelWidths } from "redux/features/layout/panelWidthsSlice";
-import { setSeparatorXPosition } from "redux/features/layout/separatorXPositionSlice";
-
-import { InterfaceEnums } from "@shared/enums";
-import {
-  LoginPage,
-  ActivatePage,
-  PasswordResetPage,
-  MainPage,
-  AclPage,
-  AboutPage,
-  UsersPage,
-  DocumentsPage,
-  NotFoundPage,
-} from "pages";
-import { SearchParamsProvider } from "hooks/useSearchParamsContext";
 
 const clockPerformance = (
   profilerId: any,
@@ -86,9 +83,6 @@ const queryClient = new QueryClient({
 });
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const disableUserSelect = useAppSelector(
-    (state) => state.layout.disableUserSelect
-  );
   const selectedThemeId: InterfaceEnums.Theme = useAppSelector(
     (state) => state.theme
   );
@@ -179,10 +173,7 @@ export const App: React.FC = () => {
         <link rel="stylesheet" type="text/css" href="/custom.css" />
       </Helmet>
       <ThemeProvider theme={themeConfig}>
-        <GlobalStyle
-          theme={themeConfig}
-          disableUserSelect={disableUserSelect}
-        />
+        <GlobalStyle theme={themeConfig} />
         <QueryClientProvider client={queryClient}>
           <div style={{ fontSize: "16px" }}>
             {/* fontSize zooms query devtools to normal size */}

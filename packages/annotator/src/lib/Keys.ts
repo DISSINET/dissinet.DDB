@@ -504,9 +504,32 @@ export default class Keys {
         if (e.ctrlKey || e.metaKey) {
           if (e.key === "c") {
             this.annotator.onCopyText();
-          }
-          if (e.key === "v") {
+          } else if (e.key === "v") {
             this.annotator.onPasteText();
+          } else if (e.key === "x") {
+            if (this.text.mode === EditMode.RAW) {
+              this.annotator.onCopyText();
+              const area = this.cursor.getSelectedArea();
+              if (area) {
+                this.text.deleteRangeText(area[0], area[1]);
+                this.cursor.reset();
+                this.cursor.setPosition(
+                  area[0].xLine,
+                  area[0].yLine - this.viewport.lineStart
+                );
+              }
+            }
+          } else if (e.key === "a") {
+            this.cursor.selectStart = {
+              yLine: 0,
+              xLine: 0,
+            }
+            
+            const lastSegment = this.text.segments[this.text.segments.length - 1];
+            this.cursor.selectEnd = {
+              xLine: lastSegment.lines[lastSegment.lines.length - 1].length,
+              yLine: lastSegment.lineEnd
+            }
           }
           break;
         }

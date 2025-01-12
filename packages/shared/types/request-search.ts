@@ -6,6 +6,7 @@ export interface IRequestSearch {
   class?: EntityEnums.Class | EntityEnums.Extension.Any;
   excluded?: EntityEnums.Class[];
   label?: string;
+  labelOrId?: string;
   entityIds?: string[];
   cooccurrenceId?: string;
   territoryId?: string;
@@ -18,11 +19,13 @@ export interface IRequestSearch {
   updatedDate?: Date;
   resourceHasDocument?: boolean;
   haveReferenceTo?: string;
+  isRootInvalid?: boolean;
 }
 
 export class RequestSearch {
   class?: EntityEnums.Class | EntityEnums.Extension.Any;
   label?: string;
+  labelOrId?: string;
   entityIds?: string[];
   cooccurrenceId?: string;
   territoryId?: string;
@@ -36,10 +39,12 @@ export class RequestSearch {
   updatedDate?: Date;
   resourceHasDocument?: boolean;
   haveReferenceTo?: string;
+  isRootInvalid?: boolean;
 
   constructor(requestData: IRequestSearch) {
     this.class = requestData.class;
     this.label = requestData.label;
+    this.labelOrId = requestData.labelOrId;
     this.status = requestData.status;
 
     if (requestData.createdDate) {
@@ -65,13 +70,14 @@ export class RequestSearch {
       }
     }
 
-    this.onlyTemplates = !!requestData.onlyTemplates;
-    this.usedTemplate = requestData.usedTemplate || undefined;
-    this.territoryId = requestData.territoryId || undefined;
-    this.language = requestData.language || undefined;
-    this.subTerritorySearch = !!requestData.subTerritorySearch;
-    this.resourceHasDocument = !!requestData.resourceHasDocument;
-    this.haveReferenceTo = requestData.haveReferenceTo || undefined;
+    this.onlyTemplates = Boolean(requestData.onlyTemplates);
+    this.usedTemplate = requestData.usedTemplate ?? undefined;
+    this.territoryId = requestData.territoryId ?? undefined;
+    this.language = requestData.language ?? undefined;
+    this.subTerritorySearch = Boolean(requestData.subTerritorySearch);
+    this.resourceHasDocument = Boolean(requestData.resourceHasDocument);
+    this.haveReferenceTo = requestData.haveReferenceTo ?? undefined;
+    this.isRootInvalid = Boolean(requestData.isRootInvalid);
   }
 
   /**
@@ -131,6 +137,7 @@ export class RequestSearch {
 
     if (
       !this.label &&
+      !this.labelOrId &&
       !this.class &&
       !this.onlyTemplates &&
       !this.resourceHasDocument &&
@@ -144,7 +151,7 @@ export class RequestSearch {
       (this.entityIds === undefined || !this.entityIds.length) &&
       !this.haveReferenceTo
     ) {
-      return new BadParams("one of the search field has to be set");
+      return new BadParams("Provide more search parameters");
     }
 
     return;

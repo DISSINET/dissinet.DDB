@@ -8,17 +8,22 @@ import { Button, Input, Loader, DocumentTitle } from "components";
 import Dropdown, { EntitySuggester, EntityTag } from "components/advanced";
 import TextAnnotator from "components/advanced/Annotator/Annotator";
 import AnnotatorProvider from "components/advanced/Annotator/AnnotatorProvider";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { FaLongArrowAltRight, FaUnlink } from "react-icons/fa";
 import { GrDocumentMissing } from "react-icons/gr";
 import { TbAnchorOff } from "react-icons/tb";
 import { TiDocumentText } from "react-icons/ti";
 import { ThemeContext } from "styled-components";
 import { COLLAPSED_TABLE_WIDTH } from "Theme/constants";
-import useResizeObserver from "use-resize-observer";
 import { StyledInfoText } from "../StatementListHeader/StatementListHeaderStyles";
 import { entitiesDict } from "@shared/dictionaries/entity";
-import { useDebounce } from "hooks";
+import { useDebounce, useResizeObserver } from "hooks";
 
 interface StatementListTextAnnotator {
   statements: IResponseStatement[];
@@ -78,6 +83,13 @@ export const StatementListTextAnnotator: React.FC<
     setShowAnnotator(true);
   }, []);
 
+  const handleHlEntitiesChange = useCallback(
+    (newHlEntities: EntityEnums.Class[]) => {
+      setHlEntities(newHlEntities);
+    },
+    []
+  );
+
   const [annotator, setAnnotator] = useState<Annotator | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchOccurences, setSearchOccurences] = useState<
@@ -95,7 +107,7 @@ export const StatementListTextAnnotator: React.FC<
     );
 
     if (newSelectedOccurence) {
-      annotator?.selectSearchOccurence(newSelectedOccurence);
+      annotator?.selectSearchOccurrence(newSelectedOccurence);
     }
   }, [searchActiveOccurence, searchOccurences]);
 
@@ -252,7 +264,7 @@ export const StatementListTextAnnotator: React.FC<
   }, [selectedDocument, territoryId]);
 
   const { ref: selectorRef, height: selectorHeight = 0 } =
-    useResizeObserver<HTMLDivElement>();
+    useResizeObserver<HTMLDivElement>({ debounceDelay: 0 });
 
   const themeContext = useContext(ThemeContext);
 
@@ -383,10 +395,11 @@ export const StatementListTextAnnotator: React.FC<
           <Dropdown.Multi.Entity
             options={entitiesDict}
             disableEmpty={true}
+
+            isClearable={true}a
+
             disableAny={true}
-            onChange={(newValues) => {
-              setHlEntities(newValues);
-            }}
+            onChange={handleHlEntitiesChange}
             value={hlEntities}
             width={
               statements.length > 0
@@ -476,7 +489,7 @@ export const StatementListTextAnnotator: React.FC<
               initialScrollEntityId={territoryId}
               displayLineNumbers={true}
               height={annotatorHeight}
-              documentId={selectedDocumentId}
+              documentId={selectedDocumentId as string}
               handleCreateStatement={handleCreateStatement}
               handleCreateTerritory={handleCreateTerritory}
               storedAnnotatorScroll={storedAnnotatorScroll}

@@ -1,13 +1,13 @@
 import { EntityEnums } from "@shared/enums";
+import { IEntity, IReference } from "@shared/types";
 import { excludedSuggesterEntities } from "Theme/constants";
 import {
   EntityDropzone,
-  EntityTag,
   EntitySuggester,
+  EntityTag,
 } from "components/advanced";
 import React from "react";
 import { StyledGridValue } from "./EntityReferenceTableStyles";
-import { IEntity, IReference } from "@shared/types";
 
 interface EntityReferenceTableValue {
   reference: IReference;
@@ -86,6 +86,7 @@ export const EntityReferenceTableValue: React.FC<EntityReferenceTableValue> = ({
           isInsideTemplate={isInsideTemplate}
           territoryParentId={territoryParentId}
           initTyped={initValueTyped}
+          // autoFocus={initValueTyped !== undefined}
           disabled={disabled}
         />
       )}

@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
 import { useSpring } from "@react-spring/web";
-import { setDisableUserSelect } from "redux/features/layout/disableUserSelectSlice";
+import React, { useEffect, useState } from "react";
 import { setPanelWidths } from "redux/features/layout/panelWidthsSlice";
 import { setSeparatorXPosition } from "redux/features/layout/separatorXPositionSlice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
@@ -71,7 +70,7 @@ export const PanelSeparator: React.FC<PanelSeparator> = ({}) => {
   const onMouseDown = (e: React.MouseEvent) => {
     setSeparatorXTempPosition(e.clientX);
     setDragging(true);
-    dispatch(setDisableUserSelect(true));
+    document.body.classList.add("no-select");
   };
 
   const onMove = (clientX: number) => {
@@ -98,7 +97,7 @@ export const PanelSeparator: React.FC<PanelSeparator> = ({}) => {
 
   const onMouseUp = () => {
     setDragging(false);
-    dispatch(setDisableUserSelect(false));
+    document.body.classList.remove("no-select");
   };
 
   useEffect(() => {

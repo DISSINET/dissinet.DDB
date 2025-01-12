@@ -18,7 +18,6 @@ import React, {
 } from "react";
 import { FaSave, FaTrash } from "react-icons/fa";
 import { RiFileEditFill } from "react-icons/ri";
-import useResizeObserver from "use-resize-observer";
 import {
   StyledCount,
   StyledCountTag,
@@ -28,6 +27,7 @@ import {
 } from "../DocumentsPageStyles";
 import theme from "Theme/theme";
 import { EntityColors } from "types";
+import { useResizeObserver } from "hooks";
 
 interface DocumentRow {
   document: IResponseDocument;

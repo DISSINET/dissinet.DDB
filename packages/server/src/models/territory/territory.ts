@@ -99,23 +99,30 @@ export class TerritoryData implements ITerritoryData, IModel {
 
 export class TerritoryValidation implements ITerritoryValidation {
   entityClasses: EntityEnums.Class[];
-  classifications: string[];
+  entityClassifications: string[];
+  entityLanguages: EntityEnums.Language[];
+  entityStatuses: EntityEnums.Status[];
   tieType: EProtocolTieType; // default is property
   propType?: string[]; // relevant only in case of Property is selected as a tie
   allowedClasses?: EntityEnums.Class[]; // not relevant if allowedEntities is set
   allowedEntities?: string[]; //
+  territoryId?: string | undefined;
   detail: string;
   active?: boolean;
 
   constructor(data: Partial<ITerritoryValidation>) {
     this.entityClasses = data.entityClasses || [];
-    this.classifications = data.classifications || [];
+    this.entityClassifications = data.entityClassifications || [];
+    this.entityLanguages = data.entityLanguages || [];
+    this.entityStatuses = data.entityStatuses || [];
+
     this.tieType = data.tieType || EProtocolTieType.Property;
 
     this.propType = data.propType;
     this.allowedClasses = data.allowedClasses;
     this.allowedEntities = data.allowedEntities;
     this.detail = data.detail || "";
+    this.territoryId = data.territoryId;
 
     this.active = data.active;
   }
@@ -172,6 +179,11 @@ class Territory extends Entity implements ITerritory {
         this.data.parent.territoryId
       );
     }
+
+    // add territory id to every validation to be able to track it
+    this.data.validations?.forEach((v: ITerritoryValidation) => {
+      v.territoryId = this.id;
+    });
 
     this.data.protocol = parentTerritory.data.protocol;
   }
@@ -386,7 +398,9 @@ class Territory extends Entity implements ITerritory {
 
     if (this.data.validations) {
       this.data.validations.forEach((v) => {
-        entityIds.push.apply(entityIds, v.classifications || []);
+        entityIds.push.apply(entityIds, v.entityClassifications || []);
+        entityIds.push.apply(entityIds, v.entityLanguages || []);
+        entityIds.push.apply(entityIds, v.entityStatuses || []);
         entityIds.push.apply(entityIds, v.propType || []);
         entityIds.push.apply(entityIds, v.allowedEntities || []);
       });

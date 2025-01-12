@@ -52,7 +52,9 @@ const initialRulesState: Record<ValidationKey, boolean> = Object.keys(
 const initValidation: ITerritoryValidation = {
   detail: "",
   entityClasses: [],
-  classifications: [],
+  entityClassifications: [],
+  entityLanguages: [],
+  entityStatuses: [],
   allowedEntities: [],
   allowedClasses: [],
   propType: [],

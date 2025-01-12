@@ -7,21 +7,20 @@ import { IRequestSearch } from "@shared/types/request-search";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { wildCardChar } from "Theme/constants";
 import api from "api";
-import { Button, Input, Loader, TypeBar } from "components";
+import { Button, Checkbox, Input, Loader, Tooltip, TypeBar } from "components";
 import Dropdown, {
   AttributeButtonGroup,
   EntityCreateModal,
   EntitySuggester,
   EntityTag,
 } from "components/advanced";
-import { useDebounce, useSearchParams } from "hooks";
+import { useDebounce, useResizeObserver, useSearchParams } from "hooks";
 import React, { useEffect, useMemo, useState } from "react";
 import { CgOptions } from "react-icons/cg";
 import { FaPlus } from "react-icons/fa";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
 import { RiCloseFill } from "react-icons/ri";
 import { DropdownItem } from "types";
-import useResizeObserver from "use-resize-observer";
 import {
   StyledAdvancedOptions,
   StyledAdvancedOptionsSign,
@@ -38,8 +37,8 @@ import {
 } from "./EntitySearchBoxStyles";
 import { EntitySearchResults } from "./EntitySearchResults/EntitySearchResults";
 
-const initValues: IRequestSearch = {
-  label: "",
+const initSearchValues: IRequestSearch = {
+  labelOrId: "",
   cooccurrenceId: "",
 };
 const defaultClassOption = {
@@ -76,12 +75,12 @@ export const EntitySearchBox: React.FC = () => {
   );
   const [templateOption, setTemplateOption] =
     useState<DropdownItem>(defaultClassOption);
-  const [searchData, setSearchData] = useState<IRequestSearch>(initValues);
+  const [searchData, setSearchData] =
+    useState<IRequestSearch>(initSearchValues);
   const debouncedValues = useDebounce<IRequestSearch>(searchData, debounceTime);
 
-  const { ref: resultRef, height = 0 } = useResizeObserver<HTMLDivElement>();
-
-  const debouncedResultsHeight = useDebounce(height, 20);
+  const { ref: resultRef, height: debouncedResultsHeight = 0 } =
+    useResizeObserver<HTMLDivElement>();
 
   const statusOptionSelected: EntityEnums.Status = useMemo(() => {
     if (!!searchData.status) {
@@ -110,8 +109,9 @@ export const EntitySearchBox: React.FC = () => {
     data: entities,
     error,
     isFetching,
+    isPending,
   } = useQuery({
-    queryKey: ["search", debouncedValues],
+    queryKey: ["search", { searchData: JSON.stringify(debouncedValues) }],
     queryFn: async () => {
       if (debouncedValues.usedTemplate === "Any") {
         const { usedTemplate, ...filters } = debouncedValues;
@@ -120,13 +120,13 @@ export const EntitySearchBox: React.FC = () => {
         return res.data;
       }
       const labelWithWildCard =
-        debouncedValues.label && debouncedValues.label?.length > 0
-          ? debouncedValues.label + wildCardChar
-          : debouncedValues.label;
+        debouncedValues.labelOrId && debouncedValues.labelOrId?.length > 0
+          ? debouncedValues.labelOrId + wildCardChar
+          : debouncedValues.labelOrId;
 
       const res = await api.entitiesSearch({
         ...debouncedValues,
-        label: labelWithWildCard,
+        labelOrId: labelWithWildCard,
       });
       return res.data;
     },
@@ -164,6 +164,10 @@ export const EntitySearchBox: React.FC = () => {
         delete changes[changeKey];
       }
     });
+
+    if (changes.isRootInvalid === false) {
+      delete newSearch.isRootInvalid;
+    }
 
     setSearchData(newSearch);
   };
@@ -233,7 +237,7 @@ export const EntitySearchBox: React.FC = () => {
   useEffect(() => {
     if (!showAdvancedOptions) {
       setSearchData({
-        label: searchData.label,
+        labelOrId: searchData.labelOrId,
       });
       setClassOption(defaultClassOption.value as EntityEnums.Class);
     }
@@ -253,7 +257,7 @@ export const EntitySearchBox: React.FC = () => {
       <StyledBoxContent>
         <StyledOptions>
           <StyledRow>
-            <StyledRowHeader>label</StyledRowHeader>
+            <StyledRowHeader>label or uuid</StyledRowHeader>
             <div
               style={{
                 display: "grid",
@@ -265,7 +269,9 @@ export const EntitySearchBox: React.FC = () => {
                 width="full"
                 placeholder="type to search"
                 changeOnType
-                onChangeFn={(value: string) => handleChange({ label: value })}
+                onChangeFn={(value: string) =>
+                  handleChange({ labelOrId: value })
+                }
               />
               {userRole !== UserEnums.Role.Viewer && (
                 <Button
@@ -324,17 +330,7 @@ export const EntitySearchBox: React.FC = () => {
                   <TypeBar entityLetter={classOption} />
                 </div>
               </StyledRow>
-              <StyledRow>
-                <StyledRowHeader>ID</StyledRowHeader>
-                <Input
-                  width="full"
-                  placeholder="ID"
-                  changeOnType
-                  onChangeFn={(value: string) =>
-                    handleChange({ entityIds: [value] })
-                  }
-                />
-              </StyledRow>
+
               <StyledRow>
                 <StyledRowHeader>status</StyledRowHeader>
                 <div style={{ position: "relative" }}>
@@ -584,6 +580,30 @@ export const EntitySearchBox: React.FC = () => {
                   />
                 )}
               </StyledRow>
+              <StyledRow>
+                <StyledRowHeader>Root T validity</StyledRowHeader>
+
+                <AttributeButtonGroup
+                  options={[
+                    {
+                      longValue: "All",
+                      shortValue: "All",
+                      onClick: () => {
+                        handleChange({ isRootInvalid: undefined });
+                      },
+                      selected: !searchData.isRootInvalid,
+                    },
+                    {
+                      longValue: "Only Invalid",
+                      shortValue: "Only Invalid",
+                      onClick: () => {
+                        handleChange({ isRootInvalid: true });
+                      },
+                      selected: searchData.isRootInvalid === true,
+                    },
+                  ]}
+                />
+              </StyledRow>
             </>
           )}
         </StyledOptions>
@@ -612,7 +632,7 @@ export const EntitySearchBox: React.FC = () => {
 
       {showEntityCreateModal && (
         <EntityCreateModal
-          labelTyped={searchData.label}
+          labelTyped={searchData.labelOrId}
           categorySelected={
             searchData.class !== EntityEnums.Extension.Any
               ? searchData.class

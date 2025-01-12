@@ -66,4 +66,13 @@ export const StyledValue = styled.div`
 export const StyledFlexList = styled.div`
   display: flex;
   flex-wrap: wrap;
+  items-align: center;
+  gap: ${({ theme }) => theme.space[2]};
+`;
+
+export const StyledLanguageList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.space[2]};
+  margin-bottom: ${({ theme }) => theme.space[2]};};
 `;

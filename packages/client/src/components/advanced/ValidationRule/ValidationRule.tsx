@@ -1,4 +1,8 @@
-import { entitiesDict } from "@shared/dictionaries";
+import {
+  entitiesDict,
+  entityStatusDict,
+  languageDict,
+} from "@shared/dictionaries";
 import { classesAll } from "@shared/dictionaries/entity";
 import { EntityEnums } from "@shared/enums";
 import { IEntity } from "@shared/types";
@@ -19,9 +23,11 @@ import {
   StyledFlexList,
   StyledGrid,
   StyledLabel,
+  StyledLanguageList,
   StyledNotActiveTag,
 } from "./ValidationRuleStyles";
 import { ValidationText } from "./ValidationText/ValidationText";
+import { LanguageTag } from "./LanguageTag";
 
 interface ValidationRule {
   validation: ITerritoryValidation;
@@ -44,7 +50,9 @@ export const ValidationRule: React.FC<ValidationRule> = ({
   const {
     detail,
     entityClasses,
-    classifications,
+    entityClassifications,
+    entityLanguages,
+    entityStatuses,
     tieType,
     propType,
     allowedClasses,
@@ -109,16 +117,16 @@ export const ValidationRule: React.FC<ValidationRule> = ({
         <Dropdown.Multi.Entity
           disableEmpty
           width="full"
-          value={entityClasses}
+          value={entityClasses ?? []}
           onChange={(values) => updateValidationRule({ entityClasses: values })}
           options={entitiesDict}
           disabled={!userCanEdit}
         />
 
-        {/* Classifications */}
-        <StyledLabel>..classified as</StyledLabel>
+        {/* Entity Classifications */}
+        <StyledLabel>classified as</StyledLabel>
         <StyledFlexList>
-          {classifications.map((classification, key) => (
+          {entityClassifications?.map((classification, key) => (
             <EntityTag
               key={key}
               flexListMargin
@@ -127,7 +135,7 @@ export const ValidationRule: React.FC<ValidationRule> = ({
                 userCanEdit && {
                   onClick: () =>
                     updateValidationRule({
-                      classifications: classifications.filter(
+                      entityClassifications: entityClassifications.filter(
                         (c) => c !== classification
                       ),
                     }),
@@ -135,14 +143,21 @@ export const ValidationRule: React.FC<ValidationRule> = ({
               }
             />
           ))}
-          {!(!userCanEdit && classifications.length > 0) && (
+          {!(
+            !userCanEdit &&
+            entityClassifications &&
+            entityClassifications?.length > 0
+          ) && (
             <EntitySuggester
               alwaysShowCreateModal
-              excludedActantIds={classifications}
+              excludedActantIds={entityClassifications}
               categoryTypes={[EntityEnums.Class.Concept]}
               onPicked={(entity) =>
                 updateValidationRule({
-                  classifications: [...classifications, entity.id],
+                  entityClassifications: [
+                    ...(entityClassifications ?? []),
+                    entity.id,
+                  ],
                 })
               }
               disabled={
@@ -150,6 +165,105 @@ export const ValidationRule: React.FC<ValidationRule> = ({
               }
             />
           )}
+        </StyledFlexList>
+
+        {/* Entity Languages */}
+        <StyledLabel>having language</StyledLabel>
+        <StyledFlexList>
+          <StyledLanguageList>
+            {entityLanguages?.map((language, key) => (
+              <LanguageTag
+                languageValue={language}
+                languageTooltip={
+                  languageDict.find((lang) => lang.value === language)?.label
+                }
+                onUnlink={
+                  userCanEdit
+                    ? () => {
+                        updateValidationRule({
+                          entityLanguages: entityLanguages.filter(
+                            (c) => c !== language
+                          ),
+                        });
+                      }
+                    : undefined
+                }
+              />
+            ))}
+          </StyledLanguageList>
+
+          {!(!userCanEdit && entityLanguages) && (
+            <Dropdown.Single.Basic
+              disabled={!userCanEdit}
+              placeholder="Add new rule language"
+              width={200}
+              options={languageDict.filter(
+                (language) =>
+                  !entityLanguages || !entityLanguages.includes(language.value)
+              )}
+              value={null}
+              onChange={(selectedOption) => {
+                const newLanguageList = [...(entityLanguages ?? [])];
+                const newLanguage = selectedOption as EntityEnums.Language;
+
+                updateValidationRule({
+                  entityLanguages: newLanguageList.includes(newLanguage)
+                    ? newLanguageList.filter(
+                        (language) => language !== newLanguage
+                      )
+                    : [...newLanguageList, newLanguage],
+                });
+              }}
+            />
+          )}
+        </StyledFlexList>
+
+        {/* Entity Statuses */}
+        <StyledLabel>having status</StyledLabel>
+        <StyledFlexList>
+          <AttributeButtonGroup
+            noMargin
+            disabled={!userCanEdit}
+            canSelectMultiple={true}
+            options={entityStatusDict.map((entityStatusOption) => {
+              return {
+                longValue: entityStatusOption["label"],
+                shortValue: entityStatusOption["label"],
+
+                onClick: () => {
+                  let newStatus: EntityEnums.Status[] = [
+                    ...(entityStatuses ?? []),
+                  ];
+                  const statusValue = entityStatusOption[
+                    "value"
+                  ] as EntityEnums.Status;
+
+                  console.log("statusValue", statusValue);
+
+                  if (entityStatuses && entityStatuses.length > 0) {
+                    // remove if already in the list
+                    if (entityStatuses.includes(statusValue)) {
+                      newStatus = entityStatuses.filter(
+                        (status) => status !== statusValue
+                      );
+                    } else {
+                      newStatus.push(statusValue);
+                    }
+                  } else {
+                    newStatus.push(statusValue);
+                  }
+
+                  updateValidationRule({ entityStatuses: newStatus });
+                },
+                selected:
+                  entityStatuses && entityStatuses.length
+                    ? entityStatuses.includes(
+                        entityStatusOption["value"] as EntityEnums.Status
+                      )
+                    : true,
+              };
+            })}
+          />
         </StyledFlexList>
 
         {/* Tie type */}
@@ -181,7 +295,8 @@ export const ValidationRule: React.FC<ValidationRule> = ({
                   allowedEntities: [],
                 }),
               selected: tieType === EProtocolTieType.Classification,
-              optionDisabled: classifications.length > 0,
+              optionDisabled:
+                entityClassifications && entityClassifications.length > 0,
             },
             {
               longValue: EProtocolTieType.Reference,

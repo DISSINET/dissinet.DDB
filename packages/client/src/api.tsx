@@ -1279,7 +1279,6 @@ class Api {
   async documentRemoveAnchor(
     documentId: string,
     entityId: string,
-    anchorText: string,
     anchorIndex: number,
     options?: IApiOptions
   ): Promise<AxiosResponse<IResponseGeneric>> {
@@ -1288,7 +1287,6 @@ class Api {
         `/documents/${documentId}/removeAnchor`,
         {
           entityId,
-          anchorText,
           anchorIndex,
         },
         options
