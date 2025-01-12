@@ -26,9 +26,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.53.3
         version: 5.53.3(react@18.3.1)
-      '@types/react-router':
-        specifier: ^5.1.20
-        version: 5.1.20
       annotator:
         specifier: link:../annotator
         version: link:../annotator
@@ -141,6 +138,9 @@ importers:
       '@types/react-redux':
         specifier: ^7.1.34
         version: 7.1.34
+      '@types/react-router':
+        specifier: ^5.1.20
+        version: 5.1.20
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
@@ -7735,7 +7735,7 @@ snapshots:
 
   '@types/react-reconciler@0.26.7':
     dependencies:
-      '@types/react': 18.3.18
+      '@types/react': 19.0.2
 
   '@types/react-reconciler@0.28.9(@types/react@19.0.2)':
     dependencies:
