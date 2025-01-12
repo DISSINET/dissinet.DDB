@@ -413,6 +413,9 @@ export class Annotator {
       xLine: this.cursor.xLine + offsetRight,
       yLine: this.cursor.yLine + this.viewport.lineStart,
     };
+    this.cursor.xLine = this.cursor.selectEnd.xLine;
+    this.cursor.yLine = this.cursor.selectEnd.yLine;
+    this.cursor.selectDirection = DIRECTION.FORWARD
     this.draw();
   }
 
