@@ -46,6 +46,7 @@ export class Segment {
       this.closingTags.push({
         position: match.index,
         tag: match[1],
+        closing: true,
       });
     }
 
@@ -249,11 +250,15 @@ class Text {
     return this.segments[segment.segmentIndex].lines[segment.lineIndex];
   }
 
-  getAbsTextIndex(cursor: IRelativeCoordinates, viewport?: Viewport, fixClosingTag?: boolean): number {
+  getAbsTextIndex(
+    cursor: IRelativeCoordinates,
+    viewport?: Viewport,
+    fixClosingTag?: boolean
+  ): number {
     const pos = this.getSegmentPosition(
       cursor.yLine + (viewport?.lineStart || 0),
       cursor.xLine,
-      fixClosingTag || undefined, 
+      fixClosingTag || undefined
     );
     if (!pos) {
       return -1;
@@ -293,6 +298,8 @@ class Text {
 
     const segment = this.segments[segmentIndex];
     const lineIndex = absLineIndex - segment.lineStart;
+
+    // compute initial start - jumpong over previous segments / previous lines in current segment
     charInLineIndex = segment.lines[lineIndex]
       ? Math.min(charInLineIndex, segment.lines[lineIndex].length)
       : 0;
@@ -301,14 +308,18 @@ class Text {
       parsedTextIndex += segment.lines[i].length;
     }
 
-    let rawTextIndex =  parsedTextIndex;
+    let rawTextIndex = parsedTextIndex;
 
+    // in raw mode - include also opening and closing tags <tag> + </tag> where applicable
     if (this.mode !== EditMode.RAW) {
       const tags = segment.openingTags
-        .concat(segment.closingTags.map((t) => ({ ...t, closing: true })))
+        .concat(segment.closingTags)
         .sort((a, b) => a.position - b.position);
       for (const tag of tags) {
-        if (tag.closing && fixClosingTag ? tag.position < rawTextIndex : tag.position <= rawTextIndex) {
+        // condition which ignores tags on same position as current rawTextIndex
+        const excludeTagFix = tag.closing && fixClosingTag;
+
+        if (excludeTagFix ? tag.position < rawTextIndex : tag.position <= rawTextIndex) {
           rawTextIndex += tag.tag.length + (tag.closing ? 3 : 2);
         }
       }
