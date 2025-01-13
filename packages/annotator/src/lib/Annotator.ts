@@ -721,7 +721,6 @@ export class Annotator {
     }
 
     let [start, end] = this.cursor.getBounds();
-
     if (start && end) {
       const indexPositionStart = this.text.getAbsTextIndex(
         new Cursor(
@@ -733,21 +732,13 @@ export class Annotator {
       );
       const indexPositionEnd = this.text.getAbsTextIndex(
         new Cursor(this.ratio, end.xLine, end.yLine - this.viewport.lineStart),
-        this.viewport
+        this.viewport,
+        true,
       );
-
-      // this.text.value =
-      //   this.text.value.slice(0, indexPositionStart) +
-      //   `<${anchor}>` +
-      //   this.text.value.slice(indexPositionStart);
-
-      // this.text.value =
-      //   this.text.value.slice(0, indexPositionEnd) +
-      //   `</${anchor}>` +
-      //   this.text.value.slice(indexPositionEnd);
 
       const beforeText = this.text.value.slice(0, indexPositionStart);
       const afterText = this.text.value.slice(indexPositionEnd);
+
       const insideText = this.text.value.slice(
         indexPositionStart,
         indexPositionEnd

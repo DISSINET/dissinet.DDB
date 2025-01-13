@@ -9,6 +9,7 @@ import Cursor from "./Cursor";
 export interface ITag {
   position: number;
   tag: string;
+  closing?: boolean;
 }
 
 export class Segment {
@@ -248,13 +249,11 @@ class Text {
     return this.segments[segment.segmentIndex].lines[segment.lineIndex];
   }
 
-  getAbsTextIndex(
-    cursor: IRelativeCoordinates,
-    viewport?: Viewport
-  ): number {
+  getAbsTextIndex(cursor: IRelativeCoordinates, viewport?: Viewport, fixClosingTag?: boolean): number {
     const pos = this.getSegmentPosition(
       cursor.yLine + (viewport?.lineStart || 0),
-      cursor.xLine
+      cursor.xLine,
+      fixClosingTag || undefined, 
     );
     if (!pos) {
       return -1;
@@ -274,7 +273,8 @@ class Text {
 
   getSegmentPosition(
     absLineIndex: number,
-    charInLineIndex: number = 0
+    charInLineIndex: number = 0,
+    fixClosingTag?: boolean
   ): SegmentPosition | null {
     // sanitize bounds
     if (absLineIndex < 0) {
@@ -301,17 +301,15 @@ class Text {
       parsedTextIndex += segment.lines[i].length;
     }
 
-    let rawTextIndex = parsedTextIndex;
+    let rawTextIndex =  parsedTextIndex;
 
     if (this.mode !== EditMode.RAW) {
-      for (const tag of segment.openingTags) {
-        if (tag.position <= rawTextIndex) {
-          rawTextIndex += tag.tag.length + 2;
-        }
-      }
-      for (const tag of segment.closingTags) {
-        if (tag.position <= rawTextIndex) {
-          rawTextIndex += tag.tag.length + 3;
+      const tags = segment.openingTags
+        .concat(segment.closingTags.map((t) => ({ ...t, closing: true })))
+        .sort((a, b) => a.position - b.position);
+      for (const tag of tags) {
+        if (tag.closing && fixClosingTag ? tag.position < rawTextIndex : tag.position <= rawTextIndex) {
+          rawTextIndex += tag.tag.length + (tag.closing ? 3 : 2);
         }
       }
     }
@@ -516,7 +514,7 @@ class Text {
    * For more characters, see deleteRangeText as that method is slighly slower that this
    * @param viewport
    * @param cursorPosition
-   * @param forwardChar 
+   * @param forwardChar
    */
   deleteTextChar(
     viewport: Viewport,
@@ -582,9 +580,7 @@ class Text {
     return rangeLines.join("\n");
   }
 
-  deleteRangeText(
-    start: IAbsCoordinates,
-    end: IAbsCoordinates  ): void {
+  deleteRangeText(start: IAbsCoordinates, end: IAbsCoordinates): void {
     // swap in case start is after end
     if (
       start.yLine > end.yLine ||
