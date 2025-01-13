@@ -518,6 +518,9 @@ export default class Keys {
                   area[0].yLine - this.viewport.lineStart
                 );
               }
+            } else if (this.text.mode === EditMode.SEMI) {
+              // TODO https://github.com/DISSINET/InkVisitor/issues/2193
+              // needs to translate selection bounds to absolute bounds...
             }
           } else if (e.key === "a") {
             this.cursor.selectStart = {
