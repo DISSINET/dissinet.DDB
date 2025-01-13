@@ -488,16 +488,54 @@ export default class Keys {
         break;
       }
 
-      case Key.PageUp:
+      case Key.PageUp: {
+        const originalViewport = this.viewport.lineStart
         this.viewport.scrollUp(this.viewport.noLines);
-        break;
 
-      case Key.PageDown:
-        this.viewport.scrollDown(this.viewport.noLines, this.text.noLines);
+        if (originalViewport === this.viewport.lineStart) {
+          this.cursor.yLine = 0;
+          this.cursor.xLine = 0;
+        }
+
+        if (e.shiftKey) {
+          this.cursor.selectEnd = {
+            xLine: this.cursor.xLine,
+            yLine: this.viewport.lineStart + this.cursor.yLine,
+          };
+        } else {
+          this.cursor.selectStart = undefined;
+          this.cursor.selectEnd = undefined;
+        }
+
         break;
+      }
+
+      case Key.PageDown: {
+        const originalViewport = this.viewport.lineStart
+        this.viewport.scrollDown(this.viewport.noLines, this.text.noLines);
+
+        if (originalViewport === this.viewport.lineStart) {
+          this.cursor.yLine = this.viewport.noLines - 1;
+        }
+        const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
+        if (line.length < this.cursor.xLine) {
+          this.cursor.xLine = line.length;
+        }
+            
+        if (e.shiftKey) {
+          this.cursor.selectEnd = {
+            xLine: this.cursor.xLine,
+            yLine: originalViewport === this.viewport.lineStart ? this.viewport.lineStart + this.viewport.noLines : this.viewport.lineStart + this.cursor.yLine,
+          };
+        } else {
+          this.cursor.selectStart = undefined;
+          this.cursor.selectEnd = undefined;
+        }
+
+        break;
+      }
 
       case Key.End:
-        const originalXLine = this.cursor.xLine;
         const line = this.text.getCurrentLine(this.viewport, this.cursor);
         if (line) {
           this.cursor.xLine = line.length;

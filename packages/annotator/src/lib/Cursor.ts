@@ -40,33 +40,26 @@ export default class Cursor
       if (this.selectStart.yLine < this.selectEnd.yLine) {
         // start is above end
         this.selectDirection = DIRECTION.FORWARD;
-        console.log("setting forward");
         return;
       } else if (this.selectStart.yLine > this.selectEnd.yLine) {
         // start is below end
         this.selectDirection = DIRECTION.BACKWARD;
-        console.log("setting backward");
         return;
       } else {
         // the same line
         if (this.selectStart.xLine < this.selectEnd.xLine) {
           // start is before end on horizontal axis
           this.selectDirection = DIRECTION.FORWARD;
-          console.log("setting forward");
-
           return;
         } else if (this.selectStart.xLine > this.selectEnd.xLine) {
           // start is after end on horizontal axis
           this.selectDirection = DIRECTION.BACKWARD;
-          console.log("setting backward");
-
           return;
         }
       }
     }
 
     this.selectDirection = undefined;
-    console.log("setting undefined");
   }
 
   getSelectionDirection(): DIRECTION | undefined {
