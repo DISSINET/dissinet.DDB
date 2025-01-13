@@ -12,6 +12,7 @@ enum Key {
   Escape = "Escape",
   Enter = "Enter",
   Delete = "Delete",
+  Home = "Home",
   End = "End",
   Meta = "Meta",
   PageUp = "PageUp",
@@ -57,6 +58,8 @@ export default class Keys {
     Key.FnLock,
     Key.NumLock,
     Key.ScrollLock,
+    Key.End,
+    Key.Home,
   ];
 
   annotator: AnnotatorCallbacks;
@@ -494,10 +497,36 @@ export default class Keys {
         break;
 
       case Key.End:
+        const originalXLine = this.cursor.xLine;
         const line = this.text.getCurrentLine(this.viewport, this.cursor);
         if (line) {
           this.cursor.xLine = line.length;
         }
+
+        if (e.shiftKey) {
+          this.cursor.selectEnd = {
+            xLine: this.cursor.xLine,
+            yLine: this.viewport.lineStart + this.cursor.yLine,
+          };
+        } else {
+          this.cursor.selectStart = undefined;
+          this.cursor.selectEnd = undefined;
+        }
+
+        break;
+
+      case Key.Home:
+        if (e.shiftKey) {
+          this.cursor.selectEnd = {
+            xLine: 0,
+            yLine: this.viewport.lineStart + this.cursor.yLine,
+          };
+        } else {
+          this.cursor.selectStart = undefined;
+          this.cursor.selectEnd = undefined;
+        }
+        this.cursor.xLine = 0;
+
         break;
 
       default:
@@ -526,13 +555,14 @@ export default class Keys {
             this.cursor.selectStart = {
               yLine: 0,
               xLine: 0,
-            }
-            
-            const lastSegment = this.text.segments[this.text.segments.length - 1];
+            };
+
+            const lastSegment =
+              this.text.segments[this.text.segments.length - 1];
             this.cursor.selectEnd = {
               xLine: lastSegment.lines[lastSegment.lines.length - 1].length,
-              yLine: lastSegment.lineEnd
-            }
+              yLine: lastSegment.lineEnd,
+            };
           }
           break;
         }
