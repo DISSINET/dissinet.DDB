@@ -45,7 +45,7 @@ export default class Keys {
     Key.CapsLock,
     Key.Shift,
     Key.Control,
-    Key.Control,
+    Key.Alt,
     Key.Tab,
     Key.Escape,
     Key.Enter,
