@@ -216,7 +216,8 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
     } else if (
       selectedCategory === EntityEnums.Class.Territory &&
       !territoryEntity &&
-      userRole !== UserEnums.Role.Admin
+      userRole !== UserEnums.Role.Admin &&
+      userRole !== UserEnums.Role.Owner
     ) {
       toast.warning("Parent territory is required!");
     } else {
@@ -352,7 +353,8 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
             </>
           )}
         </ModalInputForm>
-        {userRole === UserEnums.Role.Admin && (
+        {(userRole === UserEnums.Role.Admin ||
+          userRole === UserEnums.Role.Owner) && (
           <>
             {selectedCategory === EntityEnums.Class.Territory &&
             !territoryEntity ? (

@@ -310,7 +310,8 @@ export const UserList: React.FC<UserList> = React.memo(() => {
 
           return (
             <StyledTerritoryColumn>
-              {userRole !== UserEnums.Role.Admin ? (
+              {userRole !== UserEnums.Role.Admin &&
+              userRole !== UserEnums.Role.Owner ? (
                 <React.Fragment>
                   <EntitySuggester
                     disableTemplatesAccept
@@ -394,7 +395,8 @@ export const UserList: React.FC<UserList> = React.memo(() => {
 
           return (
             <StyledTerritoryColumn>
-              {userRole !== UserEnums.Role.Admin ? (
+              {userRole !== UserEnums.Role.Admin &&
+              userRole !== UserEnums.Role.Owner ? (
                 userRole === UserEnums.Role.Editor ? (
                   <React.Fragment>
                     <EntitySuggester
