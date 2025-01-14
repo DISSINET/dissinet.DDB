@@ -77,6 +77,185 @@ export default class Keys {
     this.annotator.element.onkeydown = this.onKeyDown.bind(this);
   }
 
+  onKeyHome({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
+    if (shiftKey) {
+      if (this.cursor.selectDirection === undefined) {
+        this.cursor.selectStart = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      }
+      this.cursor.selectEnd = {
+        xLine: 0,
+        yLine: this.viewport.lineStart + this.cursor.yLine,
+      };
+    } else {
+      this.cursor.selectStart = undefined;
+      this.cursor.selectEnd = undefined;
+    }
+    this.cursor.xLine = 0;
+
+    this.cursor.setTrueSelectionDirection();
+  }
+
+  onKeyEnd({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
+    const line = this.text.getCurrentLine(this.viewport, this.cursor);
+    if (line) {
+      this.cursor.xLine = line.length;
+    }
+
+    if (shiftKey) {
+      if (this.cursor.selectDirection === undefined) {
+        this.cursor.selectStart = {
+          xLine: this.cursor.xLine,
+          yLine: this.viewport.lineStart + this.cursor.yLine,
+        };
+      }
+      this.cursor.selectEnd = {
+        xLine: this.cursor.xLine,
+        yLine: this.viewport.lineStart + this.cursor.yLine,
+      };
+    } else {
+      this.cursor.selectStart = undefined;
+      this.cursor.selectEnd = undefined;
+    }
+
+    this.cursor.setTrueSelectionDirection();
+  }
+
+  onKeyBackspace({
+    ctrlKey,
+    shiftKey,
+  }: {
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+  }) {
+    if (this.text.mode === EditMode.HIGHLIGHT) {
+      return;
+    }
+
+    const area = this.cursor.getSelectedArea();
+    if (area) {
+      this.text.deleteRangeText(area[0], area[1]);
+      this.cursor.reset();
+      this.cursor.setPosition(
+        area[0].xLine,
+        area[0].yLine - this.viewport.lineStart
+      );
+    } else {
+      const before = this.cursor.getAbsolutePosition(this.viewport);
+      this.onArrowLeft({ ctrlKey, shiftKey });
+      const after = this.cursor.getAbsolutePosition(this.viewport);
+
+      this.text.deleteRangeText(before, after);
+
+      if (this.annotator.onTextChangeCb) {
+        this.annotator.onTextChangeCb(this.text.value);
+      }
+    }
+  }
+
+  onKeyDelete({
+    ctrlKey,
+    shiftKey,
+  }: {
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+  }) {
+    if (this.text.mode === EditMode.HIGHLIGHT) {
+      return;
+    }
+
+    const area = this.cursor.getSelectedArea();
+    if (area) {
+      this.text.deleteRangeText(area[0], area[1]);
+      this.cursor.reset();
+      this.cursor.setPosition(
+        area[0].xLine,
+        area[0].yLine - this.viewport.lineStart
+      );
+    } else {
+      const before = this.cursor.getAbsolutePosition(this.viewport);
+      this.onArrowRight({ ctrlKey, shiftKey });
+      const after = this.cursor.getAbsolutePosition(this.viewport);
+
+      this.text.deleteRangeText(before, after);
+      this.cursor.xLine = before.xLine;
+      this.cursor.yLine = before.yLine - this.viewport.lineStart;
+
+      if (this.annotator.onTextChangeCb) {
+        this.annotator.onTextChangeCb(this.text.value);
+      }
+    }
+  }
+
+  onKeyPgUp({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
+    const originalViewport = this.viewport.lineStart;
+    this.viewport.scrollUp(this.viewport.noLines);
+
+    if (originalViewport === this.viewport.lineStart) {
+      this.cursor.yLine = 0;
+      this.cursor.xLine = 0;
+    }
+
+    if (shiftKey) {
+      this.cursor.selectEnd = {
+        xLine: this.cursor.xLine,
+        yLine: this.viewport.lineStart + this.cursor.yLine,
+      };
+    } else {
+      this.cursor.selectStart = undefined;
+      this.cursor.selectEnd = undefined;
+    }
+
+    this.cursor.setTrueSelectionDirection();
+  }
+
+  onKeyPgDown({
+    ctrlKey,
+    shiftKey,
+  }: {
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+  }) {
+    const originalViewport = this.viewport.lineStart;
+    this.viewport.scrollDown(this.viewport.noLines, this.text.noLines);
+
+    if (originalViewport === this.viewport.lineStart) {
+      this.cursor.yLine = this.viewport.noLines - 1;
+    }
+    const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
+    if (line.length < this.cursor.xLine) {
+      this.cursor.xLine = line.length;
+    }
+
+    if (shiftKey) {
+      this.cursor.selectEnd = {
+        xLine: this.cursor.xLine,
+        yLine:
+          originalViewport === this.viewport.lineStart
+            ? this.viewport.lineStart + this.viewport.noLines
+            : this.viewport.lineStart + this.cursor.yLine,
+      };
+    } else {
+      this.cursor.selectStart = undefined;
+      this.cursor.selectEnd = undefined;
+    }
+
+    this.cursor.setTrueSelectionDirection();
+  }
+
+  onKeyEnter() {
+    if (this.text.mode === EditMode.HIGHLIGHT) {
+      return;
+    }
+    this.text.insertNewline(this.viewport, this.cursor);
+    this.cursor.moveToNewline();
+    if (!this.text.cursorToIndex(this.viewport, this.cursor)) {
+      this.cursor.move(0, -1);
+    }
+  }
+
   onArrowUp({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
     const originalXLine = this.cursor.xLine;
     const originalYline = this.cursor.yLine;
@@ -402,169 +581,47 @@ export default class Keys {
 
     switch (e.key) {
       case Key.Enter:
-        if (this.text.mode === EditMode.HIGHLIGHT) {
-          return;
-        }
-        this.text.insertNewline(this.viewport, this.cursor);
-        this.cursor.moveToNewline();
-        if (!this.text.cursorToIndex(this.viewport, this.cursor)) {
-          this.cursor.move(0, -1);
-        }
+        this.onKeyEnter();
         break;
 
-      case Key.ArrowUp: {
+      case Key.ArrowUp:
         this.onArrowUp(e);
         break;
-      }
 
-      case Key.ArrowDown: {
+      case Key.ArrowDown:
         this.onArrowDown(e);
         break;
-      }
 
-      case Key.ArrowLeft: {
+      case Key.ArrowLeft:
         this.onArrowLeft(e);
         break;
-      }
 
-      case Key.ArrowRight: {
+      case Key.ArrowRight:
         this.onArrowRight(e);
         break;
-      }
 
-      case Key.Backspace: {
-        if (this.text.mode === EditMode.HIGHLIGHT) {
-          return;
-        }
-
-        const area = this.cursor.getSelectedArea();
-        if (area) {
-          this.text.deleteRangeText(area[0], area[1]);
-          this.cursor.reset();
-          this.cursor.setPosition(
-            area[0].xLine,
-            area[0].yLine - this.viewport.lineStart
-          );
-        } else {
-          const before = this.cursor.getAbsolutePosition(this.viewport);
-          this.onArrowLeft(e);
-          const after = this.cursor.getAbsolutePosition(this.viewport);
-
-          this.text.deleteRangeText(before, after);
-
-          if (this.annotator.onTextChangeCb) {
-            this.annotator.onTextChangeCb(this.text.value);
-          }
-        }
+      case Key.Backspace:
+        this.onKeyBackspace(e);
         break;
-      }
 
-      case Key.Delete: {
-        if (this.text.mode === EditMode.HIGHLIGHT) {
-          return;
-        }
-
-        const area = this.cursor.getSelectedArea();
-        if (area) {
-          this.text.deleteRangeText(area[0], area[1]);
-          this.cursor.reset();
-          this.cursor.setPosition(
-            area[0].xLine,
-            area[0].yLine - this.viewport.lineStart
-          );
-        } else {
-          const before = this.cursor.getAbsolutePosition(this.viewport);
-          this.onArrowRight(e);
-          const after = this.cursor.getAbsolutePosition(this.viewport);
-
-          this.text.deleteRangeText(before, after);
-          this.cursor.xLine = before.xLine;
-          this.cursor.yLine = before.yLine - this.viewport.lineStart;
-
-          if (this.annotator.onTextChangeCb) {
-            this.annotator.onTextChangeCb(this.text.value);
-          }
-        }
+      case Key.Delete:
+        this.onKeyDelete(e);
         break;
-      }
 
-      case Key.PageUp: {
-        const originalViewport = this.viewport.lineStart
-        this.viewport.scrollUp(this.viewport.noLines);
-
-        if (originalViewport === this.viewport.lineStart) {
-          this.cursor.yLine = 0;
-          this.cursor.xLine = 0;
-        }
-
-        if (e.shiftKey) {
-          this.cursor.selectEnd = {
-            xLine: this.cursor.xLine,
-            yLine: this.viewport.lineStart + this.cursor.yLine,
-          };
-        } else {
-          this.cursor.selectStart = undefined;
-          this.cursor.selectEnd = undefined;
-        }
-
+      case Key.PageUp:
+        this.onKeyPgUp(e);
         break;
-      }
 
-      case Key.PageDown: {
-        const originalViewport = this.viewport.lineStart
-        this.viewport.scrollDown(this.viewport.noLines, this.text.noLines);
-
-        if (originalViewport === this.viewport.lineStart) {
-          this.cursor.yLine = this.viewport.noLines - 1;
-        }
-        const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
-        if (line.length < this.cursor.xLine) {
-          this.cursor.xLine = line.length;
-        }
-            
-        if (e.shiftKey) {
-          this.cursor.selectEnd = {
-            xLine: this.cursor.xLine,
-            yLine: originalViewport === this.viewport.lineStart ? this.viewport.lineStart + this.viewport.noLines : this.viewport.lineStart + this.cursor.yLine,
-          };
-        } else {
-          this.cursor.selectStart = undefined;
-          this.cursor.selectEnd = undefined;
-        }
-
+      case Key.PageDown:
+        this.onKeyPgDown(e);
         break;
-      }
 
       case Key.End:
-        const line = this.text.getCurrentLine(this.viewport, this.cursor);
-        if (line) {
-          this.cursor.xLine = line.length;
-        }
-
-        if (e.shiftKey) {
-          this.cursor.selectEnd = {
-            xLine: this.cursor.xLine,
-            yLine: this.viewport.lineStart + this.cursor.yLine,
-          };
-        } else {
-          this.cursor.selectStart = undefined;
-          this.cursor.selectEnd = undefined;
-        }
-
+        this.onKeyEnd(e);
         break;
 
       case Key.Home:
-        if (e.shiftKey) {
-          this.cursor.selectEnd = {
-            xLine: 0,
-            yLine: this.viewport.lineStart + this.cursor.yLine,
-          };
-        } else {
-          this.cursor.selectStart = undefined;
-          this.cursor.selectEnd = undefined;
-        }
-        this.cursor.xLine = 0;
-
+        this.onKeyHome(e);
         break;
 
       default:
