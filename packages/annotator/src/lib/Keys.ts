@@ -78,11 +78,23 @@ export default class Keys {
   }
 
   onKeyHome({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
+    const originalXLine = this.cursor.xLine;
+    const originalAbsYLine = this.viewport.lineStart + this.cursor.yLine;
+
+    // always start of line
+    this.cursor.xLine = 0;
+
+    if (ctrlKey) {
+      // move to top line
+      this.cursor.yLine = 0;
+      this.viewport.lineStart = 0;
+    }
+
     if (shiftKey) {
       if (this.cursor.selectDirection === undefined) {
         this.cursor.selectStart = {
-          xLine: this.cursor.xLine,
-          yLine: this.viewport.lineStart + this.cursor.yLine,
+          xLine: originalXLine,
+          yLine: originalAbsYLine,
         };
       }
       this.cursor.selectEnd = {
@@ -93,22 +105,29 @@ export default class Keys {
       this.cursor.selectStart = undefined;
       this.cursor.selectEnd = undefined;
     }
-    this.cursor.xLine = 0;
 
     this.cursor.setTrueSelectionDirection();
   }
 
   onKeyEnd({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
-    const line = this.text.getCurrentLine(this.viewport, this.cursor);
-    if (line) {
-      this.cursor.xLine = line.length;
+    const originalXLine = this.cursor.xLine;
+    const originalAbsYLine = this.viewport.lineStart + this.cursor.yLine;
+
+    if (ctrlKey) {
+      // use last viewport line + scroll to last line using viewport
+      this.cursor.yLine = this.viewport.noLines - 1;
+      this.viewport.scrollTo(this.text.noLines, this.text.noLines);
     }
+
+    // use end of final line
+    const line = this.text.getCurrentLine(this.viewport, this.cursor) || "";
+    this.cursor.xLine = line.length;
 
     if (shiftKey) {
       if (this.cursor.selectDirection === undefined) {
         this.cursor.selectStart = {
-          xLine: this.cursor.xLine,
-          yLine: this.viewport.lineStart + this.cursor.yLine,
+          xLine: originalXLine,
+          yLine: originalAbsYLine,
         };
       }
       this.cursor.selectEnd = {
@@ -258,7 +277,7 @@ export default class Keys {
 
   onArrowUp({ ctrlKey, shiftKey }: { ctrlKey?: boolean; shiftKey?: boolean }) {
     const originalXLine = this.cursor.xLine;
-    const originalYline = this.cursor.yLine;
+    const originalAbsYline = this.viewport.lineStart + this.cursor.yLine;
 
     if (this.cursor.yLine <= 0) {
       // scroll up if going outside of the viewport
@@ -300,7 +319,7 @@ export default class Keys {
         // - end = current cursor position
         this.cursor.selectStart = {
           xLine: originalXLine, // use original without alteration!
-          yLine: this.viewport.lineStart + originalYline,
+          yLine: originalAbsYline,
         };
         this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
@@ -323,7 +342,7 @@ export default class Keys {
     shiftKey?: boolean;
   }) {
     const originalXLine = this.cursor.xLine;
-    const originalYline = this.cursor.yLine;
+    const originalAbsYline = this.viewport.lineStart + this.cursor.yLine;
 
     this.cursor.move(0, 1);
 
@@ -365,7 +384,7 @@ export default class Keys {
         // - end = current cursor position
         this.cursor.selectStart = {
           xLine: originalXLine, // use original without alteration!
-          yLine: this.viewport.lineStart + originalYline,
+          yLine: originalAbsYline,
         };
         this.cursor.selectEnd = {
           xLine: this.cursor.xLine,
