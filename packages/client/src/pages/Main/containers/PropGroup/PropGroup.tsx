@@ -79,7 +79,7 @@ export const PropGroup: React.FC<PropGroup> = ({
   // territory query
   const {
     status,
-    data: territoryActants,
+    data: territoryActants = [],
     error,
     isFetching,
   } = useQuery({
@@ -92,7 +92,6 @@ export const PropGroup: React.FC<PropGroup> = ({
         return [];
       }
     },
-    initialData: [],
     enabled: !!territoryId && api.isLoggedIn(),
   });
 

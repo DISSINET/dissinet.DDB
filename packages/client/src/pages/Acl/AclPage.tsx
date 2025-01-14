@@ -24,13 +24,17 @@ const AclPage: React.FC<AclPage> = ({}) => {
   const [currentCtrlName, setCtrl] = useState("");
   const [currentMethod, setMethod] = useState("");
 
-  const { status, data, error, isFetching } = useQuery({
+  const {
+    status,
+    data = initialData,
+    error,
+    isFetching,
+  } = useQuery({
     queryKey: ["permissions"],
     queryFn: async () => {
       const res = await api.getAclPermissions();
       return res.data;
     },
-    initialData: initialData,
   });
 
   const handleSave = async (

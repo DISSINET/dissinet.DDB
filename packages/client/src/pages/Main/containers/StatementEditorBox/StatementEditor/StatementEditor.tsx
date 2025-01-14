@@ -159,7 +159,7 @@ export const StatementEditor: React.FC<StatementEditor> = ({
   // territory query
   const {
     status,
-    data: territoryActants,
+    data: territoryActants = [],
     error,
     isFetching,
   } = useQuery({
@@ -174,7 +174,6 @@ export const StatementEditor: React.FC<StatementEditor> = ({
         return [];
       }
     },
-    initialData: [],
     enabled: !!statement.data.territory?.territoryId && api.isLoggedIn(),
   });
 

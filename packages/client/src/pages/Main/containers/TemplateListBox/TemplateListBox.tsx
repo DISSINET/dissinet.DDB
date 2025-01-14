@@ -43,7 +43,7 @@ export const TemplateListBox: React.FC<TemplateListBox> = () => {
 
   const {
     status,
-    data: templatesData,
+    data: templatesData = [],
     error,
     isFetching: isFetchingTemplates,
   } = useQuery({
@@ -70,7 +70,6 @@ export const TemplateListBox: React.FC<TemplateListBox> = () => {
       return templates;
     },
     enabled: api.isLoggedIn() && fourthPanelBoxesOpened["templates"],
-    initialData: [],
   });
 
   // CREATE MODAL
