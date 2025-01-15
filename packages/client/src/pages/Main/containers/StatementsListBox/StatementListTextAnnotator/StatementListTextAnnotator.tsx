@@ -362,11 +362,12 @@ export const StatementListTextAnnotator: React.FC<
                   display: "flex",
                   gap: "0.4rem",
                   color: themeContext?.color["black"],
+                  fontSize: themeContext?.fontSize["sm"],
                 }}
               >
                 <i>No </i>
                 <TbAnchorOff />
-                <i>for Territory</i>
+                <i>for T</i>
               </div>
             )}
           </div>
