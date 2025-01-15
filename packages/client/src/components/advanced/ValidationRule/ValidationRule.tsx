@@ -355,7 +355,7 @@ export const ValidationRule: React.FC<ValidationRule> = ({
         {/* Allowed classes */}
         {tieType === EProtocolTieType.Property && (
           <>
-            <StyledLabel>Allowed E types</StyledLabel>
+            <StyledLabel>Entity types allowed in property value</StyledLabel>
             <Dropdown.Multi.Entity
               disableEmpty
               width="full"
@@ -373,7 +373,8 @@ export const ValidationRule: React.FC<ValidationRule> = ({
         <StyledLabel>
           {tieType === EProtocolTieType.Classification && "Allowed Concepts"}
           {tieType === EProtocolTieType.Reference && "Allowed Resources"}
-          {tieType === EProtocolTieType.Property && "Allowed E values"}
+          {tieType === EProtocolTieType.Property &&
+            "Entities allowed in property value"}
         </StyledLabel>
         <StyledFlexList>
           {allowedEntities?.map((entityId, key) => (
