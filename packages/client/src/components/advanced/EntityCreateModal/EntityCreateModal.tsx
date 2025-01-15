@@ -206,6 +206,8 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
     }
   };
 
+  // TODO: check if user has rights to the territoryEntity
+  // Solution below is not checking the rights of the territory children
   const handleCheckOnSubmit = () => {
     if (userRole === UserEnums.Role.Viewer) {
       toast.warning("You don't have permission to create entities");
@@ -221,18 +223,21 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
       !territoryEntity
     ) {
       toast.warning("Parent territory is required!");
-    } else if (
-      // TODO: check if user has rights to the territoryEntity
-      (selectedCategory === EntityEnums.Class.Territory ||
-        selectedCategory === EntityEnums.Class.Statement) &&
-      userRole !== UserEnums.Role.Admin &&
-      userRole !== UserEnums.Role.Owner &&
-      territoryEntity &&
-      user?.rights?.find((right) => right.territory === territoryEntity?.id)
-    ) {
-      toast.warning(
-        "You don't have permission to create entities in this territory"
-      );
+      // } else if (
+      //   (selectedCategory === EntityEnums.Class.Territory ||
+      //     selectedCategory === EntityEnums.Class.Statement) &&
+      //   userRole !== UserEnums.Role.Admin &&
+      //   userRole !== UserEnums.Role.Owner &&
+      //   territoryEntity &&
+      //   !user?.rights?.find(
+      //     (right) =>
+      //       right.territory === territoryEntity?.id &&
+      //       right.mode === UserEnums.RoleMode.Write
+      //   )
+      // ) {
+      //   toast.warning(
+      //     "You don't have permission to create entities in this territory"
+      //   );
     } else {
       handleCreateActant();
     }
