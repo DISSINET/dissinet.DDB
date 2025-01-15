@@ -24,6 +24,7 @@ import { COLLAPSED_TABLE_WIDTH } from "Theme/constants";
 import { StyledInfoText } from "../StatementListHeader/StatementListHeaderStyles";
 import { entitiesDict } from "@shared/dictionaries/entity";
 import { useDebounce, useResizeObserver } from "hooks";
+import { BiSearch } from "react-icons/bi";
 
 interface StatementListTextAnnotator {
   statements: IResponseStatement[];
@@ -352,7 +353,7 @@ export const StatementListTextAnnotator: React.FC<
             {/* T anchor line */}
             {activeTHasAnchor ? (
               <Button
-                label="Locate territory"
+                label=""
                 iconRight={<FaLongArrowAltRight />}
                 tooltipLabel="localize anchor in document"
                 inverted
@@ -376,6 +377,67 @@ export const StatementListTextAnnotator: React.FC<
             )}
           </div>
         )}
+        {isSearchAllowed && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: themeContext?.space[1],
+              marginLeft: themeContext?.space[2],
+              flex: "1",
+            }}
+          >
+            <StyledInfoText style={{ textWrap: "nowrap", marginRight: "2px" }}>
+              <BiSearch />
+            </StyledInfoText>
+            <Input
+              value={searchTerm}
+              onChangeFn={(newText: any) => {
+                setSearchTerm(newText);
+              }}
+              changeOnType
+              width={"full"}
+            />
+            {isSearchTermValid && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: themeContext?.space[2],
+                }}
+              >
+                <div
+                  style={{
+                    color: themeContext?.color["info"],
+                    fontSize: themeContext?.fontSize["xs"],
+                  }}
+                >
+                  {searchActiveOccurence + 1} / {searchOccurences.length}{" "}
+                  occurences
+                </div>
+                <Button
+                  label="⬇"
+                  color="info"
+                  onClick={() => {
+                    const nextOccurence =
+                      (searchActiveOccurence + 1) % searchOccurences.length;
+                    setSearchActiveOccurence(nextOccurence);
+                  }}
+                />
+                <Button
+                  label="⬆"
+                  color="info"
+                  onClick={() => {
+                    const prevOccurence =
+                      (searchActiveOccurence - 1 + searchOccurences.length) %
+                      searchOccurences.length;
+                    setSearchActiveOccurence(prevOccurence);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Class selector */}
@@ -384,7 +446,8 @@ export const StatementListTextAnnotator: React.FC<
           style={{
             display: "flex",
             alignItems: "center",
-            gap: themeContext?.space[6],
+            gap: themeContext?.space[4],
+            paddingRight: themeContext?.space[2],
             marginBottom: themeContext?.space[2],
           }}
           ref={selectorRef}
@@ -395,79 +458,17 @@ export const StatementListTextAnnotator: React.FC<
           <Dropdown.Multi.Entity
             options={entitiesDict}
             disableEmpty={true}
-
-            isClearable={true}a
-
+            isClearable={true}
             disableAny={true}
             onChange={handleHlEntitiesChange}
             value={hlEntities}
             width={
               statements.length > 0
-                ? contentWidth - COLLAPSED_TABLE_WIDTH - 70
-                : contentWidth - 70
+                ? contentWidth - COLLAPSED_TABLE_WIDTH - 75
+                : contentWidth - 75
             }
             noOptionsMessage="No entity classes to highlight"
           />
-        </div>
-      )}
-
-      {isSearchAllowed && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: themeContext?.space[6],
-            marginBottom: themeContext?.space[2],
-          }}
-        >
-          <StyledInfoText style={{ textWrap: "nowrap", marginRight: "13px" }}>
-            Search
-          </StyledInfoText>
-          <Input
-            value={searchTerm}
-            onChangeFn={(newText: any) => {
-              setSearchTerm(newText);
-            }}
-            changeOnType
-          />
-          {isSearchTermValid && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: themeContext?.space[2],
-              }}
-            >
-              <div
-                style={{
-                  color: themeContext?.color["info"],
-                  fontSize: themeContext?.fontSize["xs"],
-                }}
-              >
-                {searchActiveOccurence + 1} / {searchOccurences.length}{" "}
-                occurences
-              </div>
-              <Button
-                label="⬇"
-                color="info"
-                onClick={() => {
-                  const nextOccurence =
-                    (searchActiveOccurence + 1) % searchOccurences.length;
-                  setSearchActiveOccurence(nextOccurence);
-                }}
-              />
-              <Button
-                label="⬆"
-                color="info"
-                onClick={() => {
-                  const prevOccurence =
-                    (searchActiveOccurence - 1 + searchOccurences.length) %
-                    searchOccurences.length;
-                  setSearchActiveOccurence(prevOccurence);
-                }}
-              />
-            </div>
-          )}
         </div>
       )}
 
