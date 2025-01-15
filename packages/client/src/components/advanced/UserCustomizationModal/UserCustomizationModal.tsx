@@ -409,7 +409,8 @@ export const UserCustomizationModal: React.FC<UserCustomizationModal> = ({
               <StyledUserRightHeading>{"read"}</StyledUserRightHeading>
               <StyledUserRightItem>
                 <StyledRightsWrap>
-                  {role !== UserEnums.Role.Admin
+                  {role !== UserEnums.Role.Admin &&
+                  role !== UserEnums.Role.Owner
                     ? readRights.map((right, key) => (
                         <UserRightItem
                           key={key}
@@ -422,7 +423,8 @@ export const UserCustomizationModal: React.FC<UserCustomizationModal> = ({
               <StyledUserRightHeading>{"write"}</StyledUserRightHeading>
               <StyledUserRightItem>
                 <StyledRightsWrap>
-                  {role !== UserEnums.Role.Admin
+                  {role !== UserEnums.Role.Admin &&
+                  role !== UserEnums.Role.Owner
                     ? writeRights.map((right, key) => (
                         <UserRightItem
                           key={key}

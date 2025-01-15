@@ -330,7 +330,7 @@ export const DStatement = (
     props: DProps(statement.props),
     references: statement.references,
     status:
-      userRole === UserEnums.Role.Admin
+      userRole === UserEnums.Role.Admin || userRole === UserEnums.Role.Owner
         ? EntityEnums.Status.Approved
         : EntityEnums.Status.Pending,
     isTemplate: statement.isTemplate,
@@ -428,7 +428,7 @@ export const DEntity = (entity: IEntity, userRole: UserEnums.Role): IEntity => {
     props: DProps(entity.props),
     references: DReferences(entity.references),
     status:
-      userRole === UserEnums.Role.Admin
+      userRole === UserEnums.Role.Admin || userRole === UserEnums.Role.Owner
         ? EntityEnums.Status.Approved
         : EntityEnums.Status.Pending,
     isTemplate: entity.isTemplate,
@@ -461,7 +461,7 @@ export const DTerritory = (
     props: DProps(entity.props),
     references: DReferences(entity.references),
     status:
-      userRole === UserEnums.Role.Admin
+      userRole === UserEnums.Role.Admin || userRole === UserEnums.Role.Owner
         ? EntityEnums.Status.Approved
         : EntityEnums.Status.Pending,
     isTemplate: entity.isTemplate,
@@ -539,7 +539,7 @@ export const CStatement = (
     },
     props: [],
     status:
-      userRole === UserEnums.Role.Admin
+      userRole === UserEnums.Role.Admin || userRole === UserEnums.Role.Owner
         ? EntityEnums.Status.Approved
         : EntityEnums.Status.Pending,
     references: [],
@@ -573,7 +573,7 @@ export const CTerritory = (
     parent: { territoryId: parentId, order: parentOrder },
   },
   status:
-    userRole === UserEnums.Role.Admin
+    userRole === UserEnums.Role.Admin || userRole === UserEnums.Role.Owner
       ? EntityEnums.Status.Approved
       : EntityEnums.Status.Pending,
 

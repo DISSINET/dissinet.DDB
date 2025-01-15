@@ -209,7 +209,9 @@ export const EntitySuggester: React.FC<EntitySuggester> = ({
           }
         })
         .filter((s) =>
-          filterEditorRights && userRole !== UserEnums.Role.Admin
+          filterEditorRights &&
+          userRole !== UserEnums.Role.Admin &&
+          userRole !== UserEnums.Role.Owner
             ? s.right === UserEnums.RoleMode.Write
             : s
         )

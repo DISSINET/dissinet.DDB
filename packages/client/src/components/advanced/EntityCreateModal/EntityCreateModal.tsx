@@ -84,6 +84,7 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   );
 
   const userId = localStorage.getItem("userid");
+
   const {
     status: statusUser,
     data: user,
@@ -205,8 +206,12 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
     }
   };
 
+  // TODO: check if user has rights to the territoryEntity
+  // Solution below is not checking the rights of the territory children
   const handleCheckOnSubmit = () => {
-    if (label.length < 1) {
+    if (userRole === UserEnums.Role.Viewer) {
+      toast.warning("You don't have permission to create entities");
+    } else if (label.length < 1) {
       toast.info(MIN_LABEL_LENGTH_MESSAGE);
     } else if (
       selectedCategory === EntityEnums.Class.Statement &&
@@ -215,10 +220,24 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
       toast.warning("Territory is required!");
     } else if (
       selectedCategory === EntityEnums.Class.Territory &&
-      !territoryEntity &&
-      userRole !== UserEnums.Role.Admin
+      !territoryEntity
     ) {
       toast.warning("Parent territory is required!");
+      // } else if (
+      //   (selectedCategory === EntityEnums.Class.Territory ||
+      //     selectedCategory === EntityEnums.Class.Statement) &&
+      //   userRole !== UserEnums.Role.Admin &&
+      //   userRole !== UserEnums.Role.Owner &&
+      //   territoryEntity &&
+      //   !user?.rights?.find(
+      //     (right) =>
+      //       right.territory === territoryEntity?.id &&
+      //       right.mode === UserEnums.RoleMode.Write
+      //   )
+      // ) {
+      //   toast.warning(
+      //     "You don't have permission to create entities in this territory"
+      //   );
     } else {
       handleCreateActant();
     }
@@ -352,7 +371,8 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
             </>
           )}
         </ModalInputForm>
-        {userRole === UserEnums.Role.Admin && (
+        {(userRole === UserEnums.Role.Admin ||
+          userRole === UserEnums.Role.Owner) && (
           <>
             {selectedCategory === EntityEnums.Class.Territory &&
             !territoryEntity ? (
