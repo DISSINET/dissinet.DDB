@@ -101,12 +101,6 @@ export const StatementListTextAnnotator: React.FC<
   useEffect(() => {
     const newSelectedOccurence = searchOccurences[searchActiveOccurence];
 
-    console.log(
-      `selecting ${searchActiveOccurence} of`,
-      searchOccurences,
-      ` => ${newSelectedOccurence}`
-    );
-
     if (newSelectedOccurence) {
       annotator?.selectSearchOccurrence(newSelectedOccurence);
     }
