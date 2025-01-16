@@ -316,6 +316,7 @@ export const Suggester: React.FC<Suggester> = ({
             ref={refs.setReference}
             style={{
               position: "relative",
+              width: "100%",
             }}
           >
             <Input

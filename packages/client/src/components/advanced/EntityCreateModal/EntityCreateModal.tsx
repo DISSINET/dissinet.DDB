@@ -207,7 +207,6 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   };
 
   // TODO: check if user has rights to the territoryEntity
-  // Solution below is not checking the rights of the territory children
   const handleCheckOnSubmit = () => {
     if (userRole === UserEnums.Role.Viewer) {
       toast.warning("You don't have permission to create entities");
@@ -220,24 +219,11 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
       toast.warning("Territory is required!");
     } else if (
       selectedCategory === EntityEnums.Class.Territory &&
-      !territoryEntity
+      !territoryEntity &&
+      userRole !== UserEnums.Role.Admin &&
+      userRole !== UserEnums.Role.Owner
     ) {
       toast.warning("Parent territory is required!");
-      // } else if (
-      //   (selectedCategory === EntityEnums.Class.Territory ||
-      //     selectedCategory === EntityEnums.Class.Statement) &&
-      //   userRole !== UserEnums.Role.Admin &&
-      //   userRole !== UserEnums.Role.Owner &&
-      //   territoryEntity &&
-      //   !user?.rights?.find(
-      //     (right) =>
-      //       right.territory === territoryEntity?.id &&
-      //       right.mode === UserEnums.RoleMode.Write
-      //   )
-      // ) {
-      //   toast.warning(
-      //     "You don't have permission to create entities in this territory"
-      //   );
     } else {
       handleCreateActant();
     }
@@ -246,14 +232,14 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   return (
     <Modal
       showModal={showModal}
-      width={300}
+      width={800}
       isLoading={entityCreateMutation.isPending}
       onEnterPress={handleCheckOnSubmit}
       onClose={closeModal}
     >
       <ModalHeader title="Create entity" />
       <ModalContent column>
-        <ModalInputForm>
+        <ModalInputForm alignLeft>
           <ModalInputLabel>{"Class & Label: "}</ModalInputLabel>
           <ModalInputWrap>
             <EntitySuggester
