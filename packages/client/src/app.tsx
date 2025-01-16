@@ -73,7 +73,7 @@ export const RequireAuth = ({ children }: { children: JSX.Element }) => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60,
+      // staleTime: 1000 * 60,
       refetchOnWindowFocus: false,
       retry: false,
       // turn on for airplane / offline work
