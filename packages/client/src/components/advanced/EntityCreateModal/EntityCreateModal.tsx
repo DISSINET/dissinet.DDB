@@ -220,24 +220,11 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
       toast.warning("Territory is required!");
     } else if (
       selectedCategory === EntityEnums.Class.Territory &&
-      !territoryEntity
+      !territoryEntity &&
+      userRole !== UserEnums.Role.Admin &&
+      userRole !== UserEnums.Role.Owner
     ) {
       toast.warning("Parent territory is required!");
-      // } else if (
-      //   (selectedCategory === EntityEnums.Class.Territory ||
-      //     selectedCategory === EntityEnums.Class.Statement) &&
-      //   userRole !== UserEnums.Role.Admin &&
-      //   userRole !== UserEnums.Role.Owner &&
-      //   territoryEntity &&
-      //   !user?.rights?.find(
-      //     (right) =>
-      //       right.territory === territoryEntity?.id &&
-      //       right.mode === UserEnums.RoleMode.Write
-      //   )
-      // ) {
-      //   toast.warning(
-      //     "You don't have permission to create entities in this territory"
-      //   );
     } else {
       handleCreateActant();
     }
