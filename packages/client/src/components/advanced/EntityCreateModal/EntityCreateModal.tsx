@@ -207,7 +207,6 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   };
 
   // TODO: check if user has rights to the territoryEntity
-  // Solution below is not checking the rights of the territory children
   const handleCheckOnSubmit = () => {
     if (userRole === UserEnums.Role.Viewer) {
       toast.warning("You don't have permission to create entities");
@@ -233,7 +232,7 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   return (
     <Modal
       showModal={showModal}
-      width={300}
+      width={600}
       isLoading={entityCreateMutation.isPending}
       onEnterPress={handleCheckOnSubmit}
       onClose={closeModal}
