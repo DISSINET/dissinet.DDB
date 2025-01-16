@@ -124,9 +124,13 @@ export const StyledFooter = styled.div<StyledFooter>`
   padding: ${({ theme }) => theme.space[4]};
 `;
 
-export const StyledModalInputForm = styled.div`
+interface StyledModalInputForm {
+  alignLeft: boolean;
+}
+export const StyledModalInputForm = styled.div<StyledModalInputForm>`
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: ${({ alignLeft }) =>
+    alignLeft ? "auto 1fr" : "auto auto"};
   grid-row-gap: ${({ theme }) => theme.space[1]};
 `;
 export const StyledModalInputLabel = styled.p`

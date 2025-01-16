@@ -232,14 +232,14 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   return (
     <Modal
       showModal={showModal}
-      width={600}
+      width={800}
       isLoading={entityCreateMutation.isPending}
       onEnterPress={handleCheckOnSubmit}
       onClose={closeModal}
     >
       <ModalHeader title="Create entity" />
       <ModalContent column>
-        <ModalInputForm>
+        <ModalInputForm alignLeft>
           <ModalInputLabel>{"Class & Label: "}</ModalInputLabel>
           <ModalInputWrap>
             <EntitySuggester

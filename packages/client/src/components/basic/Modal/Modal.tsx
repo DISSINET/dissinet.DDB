@@ -163,9 +163,17 @@ export const ModalFooter: FC<ModalFooter> = ({ children, column = false }) => {
 // Input form helpers
 interface ModalInputForm {
   children?: React.ReactNode;
+  alignLeft?: boolean; // centered by default
 }
-export const ModalInputForm: React.FC<ModalInputForm> = ({ children }) => {
-  return <StyledModalInputForm>{children}</StyledModalInputForm>;
+export const ModalInputForm: React.FC<ModalInputForm> = ({
+  children,
+  alignLeft = false,
+}) => {
+  return (
+    <StyledModalInputForm alignLeft={alignLeft}>
+      {children}
+    </StyledModalInputForm>
+  );
 };
 interface ModalInputLabel {
   children?: React.ReactNode;
