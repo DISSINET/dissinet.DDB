@@ -62,6 +62,7 @@ export const StyledFlexList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.space[2]};
+  align-items: center;
 `;
 
 export const StyledLanguageList = styled.div`

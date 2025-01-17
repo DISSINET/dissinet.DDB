@@ -149,6 +149,7 @@ export const ValidationRule: React.FC<ValidationRule> = ({
             entityClassifications?.length > 0
           ) && (
             <EntitySuggester
+              inputWidth="full"
               alwaysShowCreateModal
               excludedActantIds={entityClassifications}
               categoryTypes={[EntityEnums.Class.Concept]}
@@ -170,33 +171,35 @@ export const ValidationRule: React.FC<ValidationRule> = ({
         {/* Entity Languages */}
         <StyledLabel>having language</StyledLabel>
         <StyledFlexList>
-          <StyledLanguageList>
-            {entityLanguages?.map((language, key) => (
-              <LanguageTag
-                languageValue={language}
-                languageTooltip={
-                  languageDict.find((lang) => lang.value === language)?.label
-                }
-                onUnlink={
-                  userCanEdit
-                    ? () => {
-                        updateValidationRule({
-                          entityLanguages: entityLanguages.filter(
-                            (c) => c !== language
-                          ),
-                        });
-                      }
-                    : undefined
-                }
-              />
-            ))}
-          </StyledLanguageList>
+          {entityLanguages && entityLanguages?.length > 0 && (
+            <StyledLanguageList>
+              {entityLanguages?.map((language, key) => (
+                <LanguageTag
+                  languageValue={language}
+                  languageTooltip={
+                    languageDict.find((lang) => lang.value === language)?.label
+                  }
+                  onUnlink={
+                    userCanEdit
+                      ? () => {
+                          updateValidationRule({
+                            entityLanguages: entityLanguages.filter(
+                              (c) => c !== language
+                            ),
+                          });
+                        }
+                      : undefined
+                  }
+                />
+              ))}
+            </StyledLanguageList>
+          )}
 
           {!(!userCanEdit && entityLanguages) && (
             <Dropdown.Single.Basic
               disabled={!userCanEdit}
               placeholder="Add new rule language"
-              width={200}
+              width="full"
               options={languageDict.filter(
                 (language) =>
                   !entityLanguages || !entityLanguages.includes(language.value)
@@ -337,6 +340,7 @@ export const ValidationRule: React.FC<ValidationRule> = ({
               ))}
               {!(!userCanEdit && propType && propType.length > 0) && (
                 <EntitySuggester
+                  inputWidth="full"
                   alwaysShowCreateModal
                   categoryTypes={[EntityEnums.Class.Concept]}
                   excludedActantIds={propType}
@@ -397,6 +401,7 @@ export const ValidationRule: React.FC<ValidationRule> = ({
 
           {isAllowedEntitiesSuggesterVisible && (
             <EntitySuggester
+              inputWidth="full"
               alwaysShowCreateModal
               categoryTypes={allowedEntitiesClasses}
               excludedActantIds={allowedEntities}
