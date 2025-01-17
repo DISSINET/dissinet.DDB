@@ -237,6 +237,7 @@ export const EntityDetailProtocol: React.FC<EntityDetailProtocol> = ({
         {startDate.length > 0 ? (
           <StyledTagWrap>
             <EntityTag
+              fullWidth
               entity={entities[startDate]}
               unlinkButton={
                 userCanEdit && {
@@ -265,6 +266,7 @@ export const EntityDetailProtocol: React.FC<EntityDetailProtocol> = ({
         {endDate.length > 0 ? (
           <StyledTagWrap>
             <EntityTag
+              fullWidth
               entity={entities[endDate]}
               unlinkButton={
                 userCanEdit && {
