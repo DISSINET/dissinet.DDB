@@ -233,6 +233,7 @@ export const EntityReferenceTable: React.FC<EntityReferenceTable> = ({
         <StyledSpareRow $marginTop={localReferences.length > 0}>
           {/* RESOURCE */}
           <EntitySuggester
+            inputWidth="full"
             alwaysShowCreateModal={alwaysShowCreateModal}
             openDetailOnCreate={openDetailOnCreate}
             territoryActants={[]}
@@ -258,6 +259,7 @@ export const EntityReferenceTable: React.FC<EntityReferenceTable> = ({
           />
           {/* VALUE */}
           <EntitySuggester
+            inputWidth="full"
             alwaysShowCreateModal={alwaysShowCreateModal}
             excludedEntityClasses={excludedSuggesterEntities}
             openDetailOnCreate={openDetailOnCreate}

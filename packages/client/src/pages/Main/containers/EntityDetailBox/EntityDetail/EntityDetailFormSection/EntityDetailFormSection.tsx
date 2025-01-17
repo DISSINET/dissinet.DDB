@@ -665,6 +665,7 @@ export const EntityDetailFormSection: React.FC<EntityDetailFormSection> = ({
 
                 <StyledAddLabel $marginTop={entity.labels.length > 1}>
                   <Input
+                    width="full"
                     placeholder="add label"
                     disabled={!userCanEdit}
                     changeOnType

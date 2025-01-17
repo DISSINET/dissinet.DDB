@@ -298,6 +298,7 @@ export const EntityDetailRelationTypeBlock: React.FC<
           {hasSuggester && (
             <StyledSuggesterWrapper>
               <EntitySuggester
+                inputWidth="full"
                 excludedEntityClasses={excludedSuggesterEntities}
                 disableTemplatesAccept
                 categoryTypes={getCategoryTypes()}
