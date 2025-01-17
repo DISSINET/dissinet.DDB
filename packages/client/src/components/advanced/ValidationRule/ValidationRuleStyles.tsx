@@ -1,25 +1,20 @@
 import styled from "styled-components";
 
-export const StyledBorderLeft = styled.div<{
+interface StyledBorderLeft {
   $active: boolean;
-}>`
-  border-left: ${({ theme, $active }) => {
-    if ($active) {
-      return `${theme.borderWidth[4]} solid`;
-    } else if (!$active) {
-      return `${theme.borderWidth[2]} solid`;
-    }
-  }};
-  border-left-color: ${({ theme, $active }) => {
-    if ($active) {
-      return theme.color.primary;
-    } else if (!$active) {
-      return theme.color.greyer;
-    }
-  }};
+}
+export const StyledBorderLeft = styled.div<StyledBorderLeft>`
+  border-left: ${({ theme, $active }) =>
+    $active
+      ? `${theme.borderWidth[4]} solid`
+      : `${theme.borderWidth[2]} solid`};
+  border-left-color: ${({ theme, $active }) =>
+    $active ? theme.color.primary : theme.color.greyer};
+
   padding-left: 1rem;
   padding-right: 2rem;
 `;
+
 export const StyledNotActiveTag = styled.div`
   color: ${({ theme }) => theme.color["white"]};
   font-size: ${({ theme }) => theme.fontSize["xs"]};
@@ -66,7 +61,6 @@ export const StyledValue = styled.div`
 export const StyledFlexList = styled.div`
   display: flex;
   flex-wrap: wrap;
-  items-align: center;
   gap: ${({ theme }) => theme.space[2]};
 `;
 
@@ -74,5 +68,5 @@ export const StyledLanguageList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.space[2]};
-  margin-bottom: ${({ theme }) => theme.space[2]};};
+  margin-bottom: ${({ theme }) => theme.space[2]};
 `;

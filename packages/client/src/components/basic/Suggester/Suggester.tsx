@@ -279,7 +279,7 @@ export const Suggester: React.FC<Suggester> = ({
 
   return (
     // div is necessary for flex to work and render the clear button properly
-    <div>
+    <div style={{ width: inputWidth === "full" ? "100%" : "" }}>
       <StyledSuggester
         $marginTop={marginTop}
         $fullWidth={inputWidth === "full"}

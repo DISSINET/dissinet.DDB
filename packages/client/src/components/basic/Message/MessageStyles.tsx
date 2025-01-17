@@ -17,5 +17,4 @@ export const StyledMessage = styled.div<StyledMessage>`
 
 export const StyledMessageTValidationContent = styled.div`
   display: inline;
-  items-align: center;
 `;
