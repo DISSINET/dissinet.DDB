@@ -8,9 +8,12 @@ import { StyledTabGroup } from "./EntityDetailBoxStyles";
 import { EntityDetailTab } from "./EntityDetailTab/EntityDetailTab";
 import update from "immutability-helper";
 import { Loader } from "components";
+import { useAppSelector } from "redux/hooks";
 
 interface EntityDetailBox {}
 export const EntityDetailBox: React.FC<EntityDetailBox> = ({}) => {
+  const ping: number = useAppSelector((state) => state.ping);
+
   const {
     detailIdArray,
     removeDetailId,
@@ -142,7 +145,7 @@ export const EntityDetailBox: React.FC<EntityDetailBox> = ({}) => {
           isFetching={isFetching}
         />
       ) : (
-        <Loader show />
+        <>{(ping === -10 || ping >= 0) && <Loader show />}</>
       )}
     </>
   );
