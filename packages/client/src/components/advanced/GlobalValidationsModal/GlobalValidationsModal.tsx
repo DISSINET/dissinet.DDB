@@ -204,7 +204,7 @@ export const GlobalValidationsModal: React.FC<GlobalValidationsModal> = ({
           onClose={() => setShowGlobalValidations(false)}
         />
         <ModalContent column enableScroll>
-          <StyledGridForm>
+          {/* <StyledGridForm>
             <StyledGridSectionHeading>
               Valency validations
             </StyledGridSectionHeading>
@@ -243,7 +243,7 @@ export const GlobalValidationsModal: React.FC<GlobalValidationsModal> = ({
                 toggleRule={() => toggleRule(val)}
               />
             ))}
-          </StyledGridForm>
+          </StyledGridForm> */}
 
           {rootTerritory && (
             <>
