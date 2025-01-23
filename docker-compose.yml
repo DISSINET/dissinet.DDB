@@ -24,9 +24,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      platform: linux/amd64
       args:
         ENV: latest
-    image: inkvisitor:latest
+    image: dissinet/inkvisitor:latest
     container_name: inkvisitor
     restart: always
     <<: *logging

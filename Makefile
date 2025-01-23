@@ -1,11 +1,11 @@
 build-inkvisitor:
-	docker build -f Dockerfile -t inkvisitor:latest --build-arg="ENV=production" . && docker save inkvisitor:latest | gzip > inkvisitor.tar.gz
+	docker build --platform linux/amd64 -f Dockerfile -t dissinet/inkvisitor:latest --build-arg="ENV=production" . && docker push dissinet/inkvisitor:latest
 
 build-inkvisitor-staging:
-	docker build -f Dockerfile -t inkvisitor:staging --build-arg="ENV=staging" . && docker save inkvisitor:staging | gzip > inkvisitor-staging.tar.gz
+	docker build --platform linux/amd64 -f Dockerfile -t dissinet/inkvisitor:staging --build-arg="ENV=staging" . && docker push dissinet/inkvisitor:staging
 
 build-inkvisitor-sandbox:
-	docker build -f Dockerfile -t inkvisitor:sandbox --build-arg="ENV=sandbox" . && docker save inkvisitor:sandbox | gzip > inkvisitor-sandbox.tar.gz
+	docker build --platform linux/amd64 -f Dockerfile -t dissinet/inkvisitor:sandbox --build-arg="ENV=sandbox" . && docker push dissinet/inkvisitor:sandbox
 
 build-niort:
-	docker build -f Dockerfile -t inkvisitor:niort --build-arg="ENV=niort" . && docker save inkvisitor:niort | gzip > inkvisitor-niort.tar.gz
+	docker build --platform linux/amd64 -f Dockerfile -t dissinet/inkvisitor:niort --build-arg="ENV=niort" . && docker push dissinet/inkvisitor:niort
