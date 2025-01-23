@@ -46,3 +46,6 @@ import/~$actants.xlsx
 /packages/database/scripts/DDDproject-cd7d53f52e07.json
 
 database_data
+
+**/*.tar
+**/*.tar.gz
