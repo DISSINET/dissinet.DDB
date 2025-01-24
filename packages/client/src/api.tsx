@@ -1261,12 +1261,13 @@ class Api {
 
   async documentRemoveAnchors(
     documentId: string,
-    entityId: string,
+    // can be both single string or array of strings
+    entityIds: string[] | string,
     options?: IApiOptions
   ): Promise<AxiosResponse<IResponseGeneric>> {
     try {
       const response = await this.connection.patch(
-        `/documents/${documentId}/removeAnchors?entityId=${entityId}`,
+        `/documents/${documentId}/removeAnchors?entityId=${entityIds}`,
         undefined,
         options
       );

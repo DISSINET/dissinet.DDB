@@ -3,12 +3,12 @@ import {
   IResponseDetail,
   IResponseUsedInDocument,
 } from "@shared/types/response-detail";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "api";
-import { DocumentTitle, Table } from "components";
+import { Button, DocumentTitle, Table } from "components";
 import { DocumentModalEdit, EntityTag } from "components/advanced";
 import React, { useMemo, useState } from "react";
-import { FaAnchor } from "react-icons/fa";
+import { FaAnchor, FaTrashAlt } from "react-icons/fa";
 import { HiClipboardList } from "react-icons/hi";
 import { CellProps, Column } from "react-table";
 import { toast } from "react-toastify";
@@ -23,16 +23,21 @@ interface EntityDetailUsedInDocumentsTable {
   entities: { [key: string]: IEntity };
   uses: IResponseUsedInDocument[];
   perPage?: number;
+  entity: IEntity;
 }
 export const EntityDetailUsedInDocumentsTable: React.FC<
   EntityDetailUsedInDocumentsTable
 > = ({ title, entities, uses = [], perPage, entity }) => {
   const data = useMemo(() => uses, [uses]);
 
+  const queryClient = useQueryClient();
+
   const removeAnchorMutation = useMutation({
-    mutationFn: (data: { documentId: string; entityId: string }) =>
-      api.documentRemoveAnchors(data.documentId, data.entityId),
-    onSuccess(data, variables, context) {},
+    mutationFn: (documentId: string) =>
+      api.documentRemoveAnchors(documentId, entity.id),
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ["entity"] });
+    },
   });
 
   const [openedDocument, setOpenedDocument] = useState<IDocumentMeta | false>(
@@ -117,12 +122,8 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
           //     icon={<FaTrashAlt />}
           //     color="danger"
           //     inverted
-          //     onClick={
-          //       () =>
-          //        removeAnchorMutation.mutate({
-          //        documentId: row.original.document.id,
-          //        entityId: entityId,
-          //        })
+          //     onClick={() =>
+          //       removeAnchorMutation.mutate(row.original.document.id)
           //     }
           //   />
           // );
@@ -139,6 +140,7 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
         columns={columns}
         data={data}
         perPage={perPage}
+        isLoading={removeAnchorMutation.isPending}
       />
       {openedDocument && (
         <DocumentModalEdit

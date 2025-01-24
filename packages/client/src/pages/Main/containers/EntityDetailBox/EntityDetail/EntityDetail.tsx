@@ -949,6 +949,7 @@ export const EntityDetail: React.FC<EntityDetail> = ({
                     entities={entity.entities}
                     uses={entity.usedInDocuments}
                     perPage={10}
+                    entity={entity}
                   />
                 )}
               </StyledDetailSection>

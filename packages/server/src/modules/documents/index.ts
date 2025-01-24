@@ -355,7 +355,11 @@ export default Router()
     "/:documentId/removeAnchors",
     asyncRouteHandler<IResponseGeneric>(
       async (
-        request: IRequest<{ documentId: string }, unknown, { entityId: string }>
+        request: IRequest<
+          { documentId: string },
+          unknown,
+          { entityIds: string[] | string }
+        >
       ) => {
         const id = request.params.documentId;
         if (!id) {
@@ -372,7 +376,7 @@ export default Router()
           throw DocumentDoesNotExist.forId(id);
         }
 
-        let entityIds: string[] | string = request.query.entityId;
+        const entityIds: string[] | string = request.query.entityIds;
         existing.removeAnchors(
           typeof entityIds === "object" ? entityIds : [entityIds]
         );
