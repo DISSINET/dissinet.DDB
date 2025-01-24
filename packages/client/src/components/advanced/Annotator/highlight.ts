@@ -1,4 +1,4 @@
-import { HighlightSchema, HighlightMode } from "@inkvisitor/annotator";
+import { HighlightMode, HighlightSchema } from "@inkvisitor/annotator";
 import { EntityEnums } from "@shared/enums";
 import { IResponseDocumentDetail } from "@shared/types";
 import { DefaultTheme } from "styled-components";
@@ -22,8 +22,8 @@ export const annotatorHighlight = (
     return {
       mode: HighlightMode.FOCUS,
       style: {
-        color: "black",
-        opacity: 0.25,
+        color: theme?.color["black"],
+        opacity: 0.07,
       },
     };
   }
