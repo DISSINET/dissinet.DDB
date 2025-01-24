@@ -127,6 +127,13 @@ export const EntityTag: React.FC<EntityTag> = ({
   const handleTagUnhovered = useCallback(() => {
     setTagHovered(false);
   }, []);
+  const handleButtonHovered = useCallback(() => {
+    setButtonHovered(true);
+  }, []);
+
+  const handleButtonUnhovered = useCallback(() => {
+    setButtonHovered(false);
+  }, []);
 
   const handleBtnClick = useCallback(() => {
     setButtonHovered(false);
@@ -196,8 +203,8 @@ export const EntityTag: React.FC<EntityTag> = ({
           lvl={lvl}
           fullWidth={fullWidth}
           isFavorited={isFavorited}
-          onButtonOver={handleTagHovered}
-          onButtonOut={handleTagUnhovered}
+          onButtonOver={handleButtonHovered}
+          onButtonOut={handleButtonUnhovered}
           onBtnClick={handleBtnClick}
           elvlButtonGroup={
             elvlButtonGroup ? (
