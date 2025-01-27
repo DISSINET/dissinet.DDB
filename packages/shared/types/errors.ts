@@ -457,7 +457,7 @@ class NetworkError extends CustomError {
   public static code = 500;
   public static title = "Connection to server lost";
   public static message =
-    "Please check your network connection. Otherwise contact the administrator.";
+    "Please check your network connection. Otherwise contact the project owner.";
 }
 
 const allErrors: Record<string, any> = {
