@@ -23,7 +23,7 @@ export const annotatorHighlight = (
       mode: HighlightMode.FOCUS,
       style: {
         color: theme?.color["black"],
-        opacity: 0.07,
+        opacity: 0.08,
       },
     };
   }
