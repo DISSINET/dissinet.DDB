@@ -4,7 +4,7 @@ import {
   getErrorByCode,
 } from "@shared/types/errors";
 import api from "api";
-import { Button, ContactAdminFooting, Modal, ModalContent } from "components";
+import { Button, ContactOwnerFooting, Modal, ModalContent } from "components";
 import React, { useEffect, useState } from "react";
 import { TbArrowForwardUp } from "react-icons/tb";
 import { useNavigate } from "react-router";
@@ -88,7 +88,7 @@ const ActivatePage: React.FC = ({}) => {
             </>
           )}
 
-          <ContactAdminFooting />
+          <ContactOwnerFooting />
         </ModalContent>
       </Modal>
     </div>

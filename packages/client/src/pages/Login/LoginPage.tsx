@@ -1,4 +1,4 @@
-import { ContactAdminFooting, Modal } from "components";
+import { ContactOwnerFooting, Modal } from "components";
 import { AttributeButtonGroup } from "components/advanced";
 import React, { useMemo, useState } from "react";
 import { FiLogIn } from "react-icons/fi";
@@ -112,7 +112,7 @@ export const LoginPage: React.FC = () => {
             />
           )}
         </div>
-        <ContactAdminFooting />
+        <ContactOwnerFooting />
       </StyledContentWrap>
     </Modal>
   );

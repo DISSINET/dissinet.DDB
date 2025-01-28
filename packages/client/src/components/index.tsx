@@ -36,7 +36,7 @@ import { Toast } from "./basic/Toast/Toast";
 import ToastWithLink from "./basic/Toast/ToastWithLink";
 import { Tooltip } from "./basic/Tooltip/Tooltip";
 import { TypeBar } from "./basic/TypeBar/TypeBar";
-import { ContactAdminFooting } from "./basic/ContactAdminFooting/ContactAdminFooting";
+import { ContactOwnerFooting } from "./basic/ContactOwnerFooting/ContactOwnerFooting";
 import { CustomScrollbar } from "./basic/CustomScrollbar/CustomScrollbar";
 import { DocumentTitle } from "./basic/DocumentTitle/DocumentTitle";
 
@@ -49,7 +49,7 @@ export {
   ButtonGroup,
   ButtonGroups,
   Checkbox,
-  ContactAdminFooting,
+  ContactOwnerFooting,
   Cloud,
   CustomScrollbar,
   Dropzone,
