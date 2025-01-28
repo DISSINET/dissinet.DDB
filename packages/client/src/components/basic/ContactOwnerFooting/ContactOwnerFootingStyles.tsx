@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const StyledContactAdmin = styled.p`
+export const StyledContactOwner = styled.p`
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize["xxs"]};
   margin-top: 1rem;

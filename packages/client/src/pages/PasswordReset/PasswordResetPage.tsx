@@ -9,7 +9,7 @@ import { SAFE_PASSWORD_DESCRIPTION } from "Theme/constants";
 import api from "api";
 import {
   Button,
-  ContactAdminFooting,
+  ContactOwnerFooting,
   Input,
   Modal,
   ModalContent,
@@ -209,7 +209,7 @@ export const PasswordResetPage: React.FC<PasswordResetPage> = ({}) => {
             </>
           )}
 
-          <ContactAdminFooting />
+          <ContactOwnerFooting />
         </ModalContent>
       </Modal>
     </div>
