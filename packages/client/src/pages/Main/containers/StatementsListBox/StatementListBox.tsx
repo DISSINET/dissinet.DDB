@@ -410,9 +410,11 @@ export const StatementListBox: React.FC = () => {
         `subT of ${data.labels[0]}`,
         data.detail,
         territoryId,
-        Infinity,
+        999,
         newTerritoryId
       );
+
+      console.log(newTerritory);
 
       territoryCreateMutation.mutate(newTerritory);
     }
