@@ -410,7 +410,7 @@ export const StatementListBox: React.FC = () => {
         `subT of ${data.labels[0]}`,
         data.detail,
         territoryId,
-        999,
+        EntityEnums.Order.Last,
         newTerritoryId
       );
 
