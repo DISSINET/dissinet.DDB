@@ -270,14 +270,11 @@ export const StatementListTextAnnotator: React.FC<
   const annotatorHeight = useMemo<number>(() => {
     let height = contentHeight - 70;
 
-    if (isSearchAllowed) {
-      height -= 30;
-    }
     if (selectorHeight) {
       height -= selectorHeight;
     }
     return height;
-  }, [contentHeight, selectorHeight, isSearchAllowed]);
+  }, [contentHeight, selectorHeight]);
 
   return (
     <animated.div style={animatedStyle}>
