@@ -260,6 +260,7 @@ export const StatementListBox: React.FC = () => {
     onSuccess: (data, variables) => {
       toast.info(`Sub Teritory created!`);
       queryClient.invalidateQueries({ queryKey: ["tree"] });
+      appendDetailId(variables.id);
     },
     onError: () => {
       toast.error(`Error: Sub Territory not created!`);
