@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
-    "pnpm": "^9.0.0"
+    "pnpm": "^10.1.0"
   },
   "scripts": {
     "start": "webpack serve --mode development --open --config webpack.development.js",

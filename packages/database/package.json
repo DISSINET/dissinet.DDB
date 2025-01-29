@@ -4,7 +4,7 @@
   "description": "Package with gui-like app for manipulating rethinkdb",
   "engines": {
     "node": "^22.11.0",
-    "pnpm": "^9.0.0"
+    "pnpm": "^10.1.0"
   },
   "scripts": {
     "start": "npx ts-node -r tsconfig-paths/register scripts/import.ts",
