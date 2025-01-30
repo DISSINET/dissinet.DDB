@@ -8,7 +8,7 @@ export const ContactOwnerFooting: React.FC<ContactOwnerFooting> = ({}) => {
   const { data: ownerMail } = useQuery({
     queryKey: ["owner"],
     queryFn: async () => {
-      const res = await api.usersGetOwner();
+      const res = await api.usersGetOwner({ ignoreErrorToast: true });
       return res.data.data;
     },
   });
