@@ -1,4 +1,4 @@
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { sign as signJwt } from "jsonwebtoken";
 import { IUser } from "@shared/types/user";
 import { expressjwt, Request as JWTRequest } from "express-jwt";
