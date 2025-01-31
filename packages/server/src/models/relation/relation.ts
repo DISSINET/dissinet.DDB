@@ -7,6 +7,7 @@ import {
   InternalServerError,
   ModelNotValidError,
   RelationAsymetricalPathExist,
+  RelationPathExist,
 } from "@shared/types/errors";
 import User from "@models/user/user";
 import { IRequest } from "../../custom_typings/request";
@@ -184,12 +185,17 @@ export default class Relation implements IRelationModel {
    * @param request
    */
   async beforeSave(request: IRequest): Promise<void> {
-    if (RelationTypes.RelationRules[this.type]?.asymmetrical) {
-      const pathHelper = new Path(this.type);
-      await pathHelper.build(
-        await Relation.getByType(request.db.connection, this.type)
-      );
+    const pathHelper = new Path(this.type);
+    await pathHelper.build(
+      await Relation.getByType(request.db.connection, this.type)
+    );
 
+    // check for already existing relation with the same path
+    if (pathHelper.pathExists(this.entityIds[0], this.entityIds[1])) {
+      throw new RelationPathExist();
+    }
+
+    if (RelationTypes.RelationRules[this.type]?.asymmetrical) {
       if (pathHelper.pathExists(this.entityIds[1], this.entityIds[0])) {
         // default message for asymetrical path err
         let message = RelationAsymetricalPathExist.message;
