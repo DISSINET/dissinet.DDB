@@ -493,12 +493,14 @@ export const StatementListBox: React.FC = () => {
       api.relationsCreate(newRelations),
     onSuccess: (data, variables) => {
       const errorRows = data.filter((row) => (row as any).error);
+      if (data.length - errorRows.length > 0) {
+        // TODO: singular / plural
+        toast.success(`${data.length - errorRows.length} relations created`);
+      }
       if (errorRows.length > 0) {
         toast.error(
           `Some relaions ${errorRows.length} were not possible to create`
         );
-      } else {
-        toast.success(`${data.length} relations created`);
       }
       queryClient.invalidateQueries({
         queryKey: ["territory"],
