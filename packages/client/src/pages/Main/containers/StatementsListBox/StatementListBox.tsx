@@ -490,16 +490,18 @@ export const StatementListBox: React.FC = () => {
 
   const relationsCreateMutation = useMutation({
     mutationFn: async (newRelations: Relation.IRelation[]) =>
-      api.relationsCreate(newRelations),
+      api.relationsCreate(newRelations, { ignoreErrorToast: true }),
     onSuccess: (data, variables) => {
       const errorRows = data.filter((row) => (row as any).error);
-      if (data.length - errorRows.length > 0) {
-        // TODO: singular / plural
-        toast.success(`${data.length - errorRows.length} relations created`);
+      const successCount = data.length - errorRows.length;
+      if (successCount > 0) {
+        toast.success(
+          `${successCount} relation${successCount === 1 ? "" : "s"} created`
+        );
       }
       if (errorRows.length > 0) {
         toast.error(
-          `Some relaions ${errorRows.length} were not possible to create`
+          `Some relations ${errorRows.length} were not possible to create`
         );
       }
       queryClient.invalidateQueries({
