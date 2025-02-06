@@ -350,6 +350,19 @@ class RelationDoesNotExist extends CustomError {
 }
 
 /**
+ * RelationPathExists will be thrown when attempting to add relation while there could already be the same path
+ */
+class RelationPathExist extends CustomError {
+  public static code = 400;
+  public static title = "Relation not created";
+  public static message = "Relation constraint already exists";
+
+  static forId(id: string): RelationPathExist {
+    return new RelationPathExist(RelationPathExist.message.replace("$1", id));
+  }
+}
+
+/**
  * RelationAsymetricalPathExist will be thrown when attempting to add asymetrical relation while there could already be path from A -> B
  */
 class RelationAsymetricalPathExist extends CustomError {
@@ -486,6 +499,7 @@ const allErrors: Record<string, any> = {
   StatementInvalidMove,
   EmailError,
   RelationDoesNotExist,
+  RelationPathExist,
   RelationAsymetricalPathExist,
   DocumentDoesNotExist,
   NetworkError,
@@ -536,6 +550,7 @@ export {
   StatementInvalidMove,
   EmailError,
   RelationDoesNotExist,
+  RelationPathExist,
   RelationAsymetricalPathExist,
   DocumentDoesNotExist,
   NetworkError,

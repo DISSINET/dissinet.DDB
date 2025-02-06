@@ -26,6 +26,7 @@ import { StatementListHeader } from "./StatementListHeader/StatementListHeader";
 import { StatementListTable } from "./StatementListTable/StatementListTable";
 import { StatementListTextAnnotator } from "./StatementListTextAnnotator/StatementListTextAnnotator";
 import { StyledEmptyState, StyledTableWrapper } from "./StatementLitBoxStyles";
+import { RelationPathExist } from "@shared/types/errors";
 
 const initialData: {
   statements: IResponseStatement[];
@@ -490,15 +491,29 @@ export const StatementListBox: React.FC = () => {
 
   const relationsCreateMutation = useMutation({
     mutationFn: async (newRelations: Relation.IRelation[]) =>
-      api.relationsCreate(newRelations),
+      api.relationsCreate(newRelations, { ignoreErrorToast: true }),
     onSuccess: (data, variables) => {
       const errorRows = data.filter((row) => (row as any).error);
-      if (errorRows.length > 0) {
-        toast.error(
-          `Some relaions ${errorRows.length} were not possible to create`
+      const errorCount = errorRows.length;
+      const successCount = data.length - errorCount;
+
+      if (successCount > 0) {
+        toast.success(
+          `${successCount} relation${successCount === 1 ? "" : "s"} created`
         );
-      } else {
-        toast.success(`${data.length} relations created`);
+      }
+      if (errorCount > 0) {
+        if (errorRows[0].details.error === "RelationPathExist") {
+          toast.error(
+            `${errorCount} relation${
+              errorCount === 1 ? "" : "s"
+            } to this entity already existed`
+          );
+        } else {
+          toast.error(
+            `Some relations ${errorCount} were not possible to create`
+          );
+        }
       }
       queryClient.invalidateQueries({
         queryKey: ["territory"],
