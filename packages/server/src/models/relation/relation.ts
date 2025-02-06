@@ -185,17 +185,25 @@ export default class Relation implements IRelationModel {
    * @param request
    */
   async beforeSave(request: IRequest): Promise<void> {
-    const pathHelper = new Path(this.type);
-    await pathHelper.build(
-      await Relation.getByType(request.db.connection, this.type)
+    // check for already existing relations with same ids
+    const relationByType = await Relation.getByType(
+      request.db.connection,
+      this.type
     );
-
-    // check for already existing relation with the same path
-    if (pathHelper.pathExists(this.entityIds[0], this.entityIds[1])) {
-      throw new RelationPathExist();
-    }
+    relationByType.forEach((rel) => {
+      if (
+        rel.entityIds[0] === this.entityIds[0] &&
+        rel.entityIds[1] === this.entityIds[1]
+      ) {
+        throw new RelationPathExist();
+      }
+    });
 
     if (RelationTypes.RelationRules[this.type]?.asymmetrical) {
+      const pathHelper = new Path(this.type);
+      await pathHelper.build(
+        await Relation.getByType(request.db.connection, this.type)
+      );
       if (pathHelper.pathExists(this.entityIds[1], this.entityIds[0])) {
         // default message for asymetrical path err
         let message = RelationAsymetricalPathExist.message;
