@@ -1,6 +1,7 @@
+import { UserEnums } from "@shared/enums";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "api";
-import { Header, Loader, Toast } from "components";
+import { Header, Loader } from "components";
 import {
   LeftHeader,
   RightHeader,
@@ -18,7 +19,6 @@ import { setUsername } from "redux/features/usernameSlice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import { ThemeColor } from "Theme/theme";
 import { StyledPage, StyledPageContent } from "./PageStyles";
-import { UserEnums } from "@shared/enums";
 
 interface Page {
   children?: React.ReactNode;
@@ -180,7 +180,6 @@ export const Page: React.FC<Page> = ({ children }) => {
           onClose={() => setUserCustomizationOpen(false)}
         />
       )}
-      <Toast />
     </StyledPage>
   );
 };

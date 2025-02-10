@@ -209,7 +209,7 @@ export const PasswordResetPage: React.FC<PasswordResetPage> = ({}) => {
             </>
           )}
 
-          <ContactOwnerFooting />
+          {/* <ContactOwnerFooting /> */}
         </ModalContent>
       </Modal>
     </div>

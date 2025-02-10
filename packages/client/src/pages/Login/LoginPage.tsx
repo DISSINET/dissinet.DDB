@@ -112,7 +112,7 @@ export const LoginPage: React.FC = () => {
             />
           )}
         </div>
-        <ContactOwnerFooting />
+        {/* <ContactOwnerFooting /> */}
       </StyledContentWrap>
     </Modal>
   );

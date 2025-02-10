@@ -2,6 +2,7 @@ import { InterfaceEnums } from "@shared/enums";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import api from "api";
+import { Toast } from "components";
 import { Page } from "components/advanced";
 import { useDebounce } from "hooks";
 import { SearchParamsProvider } from "hooks/useSearchParamsContext";
@@ -253,6 +254,8 @@ export const App: React.FC = () => {
 
                     <Route path="*" element={<NotFoundPage />} />
                   </Routes>
+
+                  <Toast />
                 </Page>
               </SearchParamsProvider>
             </BrowserRouter>
