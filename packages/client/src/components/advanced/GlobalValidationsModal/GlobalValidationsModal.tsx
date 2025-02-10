@@ -287,6 +287,14 @@ export const GlobalValidationsModal: React.FC<GlobalValidationsModal> = ({
                   }
                 )}
               </StyledValidationList>
+              <div style={{ marginTop: "2rem" }}>
+                <Button
+                  icon={<FaPlus />}
+                  label="new validation rule"
+                  color="primary"
+                  onClick={initValidationRule}
+                />
+              </div>
             </>
           )}
 

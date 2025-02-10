@@ -197,6 +197,19 @@ export const EntityDetailValidationSection: React.FC<
         </StyledValidationList>
       )}
 
+      {userCanEdit && validations && validations.length > 0 && (
+        <div
+          style={{ marginLeft: "1rem", marginRight: "1rem", marginTop: "2rem" }}
+        >
+          <Button
+            color="primary"
+            label="validation rule"
+            icon={<FaPlus />}
+            onClick={initValidationRule}
+          />
+        </div>
+      )}
+
       <Submit
         show={tempIndexToRemove !== false}
         title="Remove validation rule"
