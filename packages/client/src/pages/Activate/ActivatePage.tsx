@@ -88,7 +88,7 @@ const ActivatePage: React.FC = ({}) => {
             </>
           )}
 
-          <ContactOwnerFooting />
+          {/* <ContactOwnerFooting /> */}
         </ModalContent>
       </Modal>
     </div>
