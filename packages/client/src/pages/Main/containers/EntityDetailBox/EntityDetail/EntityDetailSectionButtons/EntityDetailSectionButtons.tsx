@@ -32,7 +32,7 @@ export const EntityDetailSectionButtons: React.FC<
   return (
     <>
       <ButtonGroup
-        height={19}
+        $height={19}
         style={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}
       >
         <Button
