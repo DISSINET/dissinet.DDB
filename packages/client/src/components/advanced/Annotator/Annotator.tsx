@@ -480,7 +480,9 @@ export const TextAnnotator = ({
         {isMenuDisplayed && (
           <StyledAnnotatorMenu
             $top={
-              menuPositionY > contentHeight ? contentHeight / 2 : menuPositionY
+              menuPositionY + 300 > contentHeight
+                ? contentHeight / 2
+                : menuPositionY
             }
             $left={100}
             // $translateY={"100%"}
