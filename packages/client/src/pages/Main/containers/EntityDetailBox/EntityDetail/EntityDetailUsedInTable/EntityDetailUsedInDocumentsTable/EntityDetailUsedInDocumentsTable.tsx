@@ -58,7 +58,7 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
                 <StyledAnchorText>
                   <HiClipboardList
                     size={18}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", flexShrink: 0 }}
                     onClick={() => {
                       window.navigator.clipboard.writeText(anchorText);
                       toast.info("text copied to clipboard");
