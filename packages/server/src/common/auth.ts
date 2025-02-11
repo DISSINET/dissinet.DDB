@@ -46,6 +46,7 @@ export function checkPassword(
 
 const defaultJwtAlgo = "HS256";
 
+// apply altered secret variable - each run will get secret refresh
 let secret = (process.env.SECRET as string) || "";
 if (process.env.NODE_ENV !== "test") {
   if (process.argv.length > 3) {
