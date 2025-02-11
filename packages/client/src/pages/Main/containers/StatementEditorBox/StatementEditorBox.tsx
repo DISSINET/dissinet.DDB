@@ -57,23 +57,6 @@ export const StatementEditorBox: React.FC = () => {
     enabled: !!statementId && api.isLoggedIn(),
   });
 
-  const { data: dataActions, error: errorActions } = useQuery({
-    queryKey: ["statement-actions", statementId],
-    queryFn: async () => {
-      const actionIds = statement?.data.actions.map((a) => a.actionId);
-      if (actionIds === undefined) {
-        return [];
-      }
-      const actions = [];
-      for (const actionId of actionIds) {
-        const res = await api.entitiesGet(actionId);
-        actions.push(res.data);
-      }
-      return actions;
-    },
-    enabled: statement !== undefined && !!statementId && api.isLoggedIn(),
-  });
-
   useEffect(() => {
     if (
       statementError &&
@@ -94,6 +77,9 @@ export const StatementEditorBox: React.FC = () => {
       }
       queryClient.invalidateQueries({ queryKey: ["statement"] });
       queryClient.invalidateQueries({ queryKey: ["territory"] });
+      queryClient.invalidateQueries({
+        queryKey: ["statement-actions", { statementId }],
+      });
       if (variables.labels[0] !== undefined) {
         queryClient.invalidateQueries({ queryKey: ["detail-tab-entities"] });
       }
@@ -277,62 +263,70 @@ export const StatementEditorBox: React.FC = () => {
     if (newActant === undefined) {
       return changes;
     } else {
-      const newActantEntity = await api.entitiesGet(newActant.entityId);
+      const actionIds =
+        statement?.data.actions.map((a) => a.actionId).filter((a) => a) ?? [];
 
-      const actantPosition = newActant.position;
+      // do not check if there are no valid actions
+      if (actionIds.length === 0) {
+        return changes;
+      }
 
-      // check what entity types are allowed for actions
-      const allowedSTypes = dataActions
+      const entitiesData = await api.entitiesSearch({
+        entityIds: [newActant.entityId, ...actionIds],
+      });
+
+      const newActantEntity = entitiesData.data.find(
+        (e) => e.id === newActant.entityId
+      );
+      const actionEntities = entitiesData.data.filter(
+        (e) => e.class === EntityEnums.Class.Action
+      );
+
+      // if actant entity is not found, do not change anything
+      if (!newActantEntity) {
+        return changes;
+      }
+
+      const newActantEntityClass = newActantEntity.class;
+
+      // check what entity types are allowed for given actions
+      const allowedSTypes = actionEntities
         ?.map((action) => {
           return action.data.entities.s;
         })
         .flat();
 
-      const allowedA1Types = dataActions
+      const allowedA1Types = actionEntities
         ?.map((action) => {
           return action.data.entities.a1;
         })
         .flat();
 
-      const allowedA2Types = dataActions
+      const allowedA2Types = actionEntities
         ?.map((action) => {
           return action.data.entities.a2;
         })
         .flat();
 
-      const allowedS = allowedSTypes?.includes(newActantEntity.data.class);
-      const allowedA1 = allowedA1Types?.includes(newActantEntity.data.class);
-      const allowedA2 = allowedA2Types?.includes(newActantEntity.data.class);
+      const isAcceptedS = allowedSTypes?.includes(newActantEntityClass);
+      const isAcceptedA1 = allowedA1Types?.includes(newActantEntityClass);
+      const isAcceptedA2 = allowedA2Types?.includes(newActantEntityClass);
 
       let newPosition: false | EntityEnums.Position = false;
 
-      if (actantPosition === EntityEnums.Position.Subject && !allowedS) {
-        if (allowedA1) {
-          newPosition = EntityEnums.Position.Actant1;
-        } else if (allowedA2) {
-          newPosition = EntityEnums.Position.Actant2;
-        } else {
-          newPosition = EntityEnums.Position.PseudoActant;
-        }
-      } else if (
-        actantPosition === EntityEnums.Position.Actant1 &&
-        !allowedA1
-      ) {
-        if (allowedA2) {
-          newPosition = EntityEnums.Position.Actant2;
-        } else {
-          newPosition = EntityEnums.Position.PseudoActant;
-        }
-      } else if (
-        actantPosition === EntityEnums.Position.Actant2 &&
-        !allowedA2
-      ) {
+      if (isAcceptedS) {
+        newPosition = EntityEnums.Position.Subject;
+      } else if (isAcceptedA1) {
+        newPosition = EntityEnums.Position.Actant1;
+      } else if (isAcceptedA2) {
+        newPosition = EntityEnums.Position.Actant2;
+      } else {
         newPosition = EntityEnums.Position.PseudoActant;
       }
 
-      if (newPosition !== false) {
+      if (newPosition !== EntityEnums.Position.Subject) {
         toast.info(
-          `Statement Actions valency rules do not allow Actant position "${actantPosition}" for ${newActantEntity.data.labels[0]}. It was moved to "${newPosition}".`
+          `Actant position for ${newActantEntity.labels[0]} changes to "${newPosition}" based on the allowed action valency constains.`
         );
         newActant.position = newPosition;
       }
