@@ -33,8 +33,8 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
   const queryClient = useQueryClient();
 
   const removeAnchorMutation = useMutation({
-    mutationFn: (documentId: string) =>
-      api.documentRemoveAnchors(documentId, entity.id),
+    mutationFn: (data: { documentId: string; anchorIndex: number }) =>
+      api.documentRemoveAnchor(data.documentId, entity.id, data.anchorIndex),
     onSuccess(data, variables, context) {
       queryClient.invalidateQueries({ queryKey: ["entity"] });
     },
@@ -58,7 +58,7 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
                 <StyledAnchorText>
                   <HiClipboardList
                     size={18}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", flexShrink: 0 }}
                     onClick={() => {
                       window.navigator.clipboard.writeText(anchorText);
                       toast.info("text copied to clipboard");
@@ -116,17 +116,19 @@ export const EntityDetailUsedInDocumentsTable: React.FC<
         id: "action btns",
         Header: "",
         Cell: ({ row }: CellType) => {
-          return <></>;
-          // return (
-          //   <Button
-          //     icon={<FaTrashAlt />}
-          //     color="danger"
-          //     inverted
-          //     onClick={() =>
-          //       removeAnchorMutation.mutate(row.original.document.id)
-          //     }
-          //   />
-          // );
+          return (
+            <Button
+              icon={<FaTrashAlt />}
+              color="danger"
+              inverted
+              onClick={() =>
+                removeAnchorMutation.mutate({
+                  documentId: row.original.document.id,
+                  anchorIndex: row.index,
+                })
+              }
+            />
+          );
         },
       },
     ],
