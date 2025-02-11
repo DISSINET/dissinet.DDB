@@ -91,7 +91,7 @@ Package containing typescript definitions, types and enums, that should be avail
 
 ### Install
 
-Install `pnpm` version `>=8.6.0`. You can switch the `pnpm` versions by running `corepack prepare pnpm@<version> --activate`.
+Install `pnpm` version `>=10.1.0`. You can switch the `pnpm` versions by running `corepack prepare pnpm@<version> --activate`.
 Go to all three folders in `packages` (`client`, `server`, `database`) and run `pnpm i` in each of them.
 Before continuing, please ensure that you have database instance setup & running (see deploying with docker below)
 
@@ -106,7 +106,7 @@ To use docker to deploy the InkVisitor application:
 1.  Install [docker](https://docs.docker.com/get-docker/), [docker-compose tool](https://docs.docker.com/compose/install/).
 2.  Install [pnpm](https://pnpm.io/).
 3.  Clone | Fork | Download the Inkvisitor [repository](https://github.com/DISSINET/InkVisitor).
-4.  For server - prepare `.env` files for servers listed under `env_file` sections in `docker-compose.yml` file. Check the server's [README.md](https://github.com/DISSINET/InkVisitor/blob/dev/packages/server/README.md) and [example.env](https://github.com/DISSINET/InkVisitor/blob/dev/packages/server/env/example.env) files for more information. Install server dependencies by `pnpm i` 
+4.  For server - prepare `.env` files for servers listed under `env_file` sections in `docker-compose.yml` file. Check the server's [README.md](https://github.com/DISSINET/InkVisitor/blob/dev/packages/server/README.md) and [example.env](https://github.com/DISSINET/InkVisitor/blob/dev/packages/server/env/example.env) files for more information. Install server dependencies by `pnpm i`
 5.  For client app - prepare `.env.<ENV>` file that should identify the appropriate environment under the `build -> args` section in `docker-compose.yml` file. You can see the client's [README.md](https://github.com/DISSINET/InkVisitor/blob/dev/packages/client/README.md) and [example.env](https://github.com/DISSINET/InkVisitor/blob/dev/packages/client/env/example.env) files to ensure you have included all the necessary configuration information.
 6.  Run the database - first, prepare `.env` file according to the documentation. Then, run either as a standalone service or containerized using `docker-compose up -d database`. Now, you have to create a database `inkvisitor` - one option is to navigate to `http://localhost:8080/#dataexplorer` and run query `r.dbCreate("inkvisitor")`.
 7.  The database will be now empty, so to set up the database structure and import some testing data, go to `packages/database` and run `pnpm start` (`pnpm i` might be needed as well). Following the information in the prompt - first, choose database `inkvisitor` by pressing the `L` key, then pick a dataset to import using the `D` key. We recommend to use the `empty` dataset for the first run. Then, press `X` to process the import. Navigate to `http://localhost:8080/#dataexplorer` and enter query `r.db('inkvisitor').table('entities')` to check if the import went fine.
@@ -114,7 +114,7 @@ To use docker to deploy the InkVisitor application:
 9.  Run the containerized application with the command `docker-compose up inkvisitor` (or `inkvisitor-<env>`).
 
 ### Kubernetes
- 
+
 See [kube](./kube) directory for examples. Please, check your cluster's capabilities as the setup could differ.
 
 ### Deploy by packages
