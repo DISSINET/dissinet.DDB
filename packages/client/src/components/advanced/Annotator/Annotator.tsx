@@ -24,6 +24,7 @@ import {
   StyledScrollerViewport,
 } from "./AnnotatorStyles";
 import { annotatorHighlight } from "./highlight";
+import { useAppSelector } from "redux/hooks";
 
 interface TextAnnotatorProps {
   width: number;
@@ -62,6 +63,10 @@ export const TextAnnotator = ({
 }: TextAnnotatorProps) => {
   const queryClient = useQueryClient();
   const theme = useContext(ThemeContext);
+
+  const contentHeight: number = useAppSelector(
+    (state) => state.layout.contentHeight
+  );
 
   const { annotator, setAnnotator } = useAnnotator();
 
@@ -315,7 +320,7 @@ export const TextAnnotator = ({
     }
   }, [initialScrollEntityId, mainCanvas.current]);
 
-  // check if the selection is in the first half of the viewportr
+  // check if the selection is in the first half of the viewport
   const menuSelectionPosition = useMemo<"top" | "bottom" | "both">(() => {
     const vStart = annotator?.viewport?.lineStart ?? 0;
     const yEnd = (annotator?.cursor?.selectEnd?.yLine ?? 0) - vStart;
@@ -325,6 +330,7 @@ export const TextAnnotator = ({
 
     const yCenter = yStart && yEnd ? (yStart + yEnd) / 2 : 0;
     const viewportMiddle = allLines / 2;
+    console.log(viewportMiddle);
 
     // if the selection is spanning through both halves of the viewport
     if (
@@ -361,7 +367,7 @@ export const TextAnnotator = ({
       if (isSelectionTopDown) {
         return "-100%";
       } else {
-        return "0%%";
+        return "0%";
       }
     }
   }, [menuSelectionPosition, isSelectionTopDown]);
@@ -473,7 +479,11 @@ export const TextAnnotator = ({
       <StyledCanvasWrapper>
         {isMenuDisplayed && (
           <StyledAnnotatorMenu
-            $top={menuPositionY}
+            $top={
+              menuPositionY + 300 > contentHeight
+                ? contentHeight / 2
+                : menuPositionY
+            }
             $left={100}
             // $translateY={"100%"}
             $translateY={translateMenu}

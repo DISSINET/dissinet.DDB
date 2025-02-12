@@ -1,7 +1,11 @@
 import styled from "styled-components";
 
 interface StyledWrap {}
-export const StyledWrap = styled.div<StyledWrap>``;
+export const StyledWrap = styled.div<StyledWrap>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 interface StyledPropButtonGroup {
   $leftMargin?: boolean;
   $rightMargin?: boolean;
