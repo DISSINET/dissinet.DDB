@@ -191,6 +191,13 @@ export const GlobalValidationsModal: React.FC<GlobalValidationsModal> = ({
     setRules((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  useEffect(() => {
+    const newSettings: Omit<ISetting, "public">[] = Object.entries(rules).map(
+      ([id, value]) => ({ id, value })
+    );
+    updateSettingsMutation.mutate(newSettings);
+  }, [rules]);
+
   return (
     <>
       <Modal
@@ -303,22 +310,9 @@ export const GlobalValidationsModal: React.FC<GlobalValidationsModal> = ({
         <ModalFooter>
           <ButtonGroup>
             <Button
-              color="warning"
-              label="cancel"
+              color="success"
+              label="done"
               onClick={() => setShowGlobalValidations(false)}
-            />
-            <Button
-              color="primary"
-              label="submit"
-              disabled={
-                JSON.stringify(settingsKeyValue) === JSON.stringify(rules)
-              }
-              onClick={() => {
-                const newSettings: Omit<ISetting, "public">[] = Object.entries(
-                  rules
-                ).map(([id, value]) => ({ id, value }));
-                updateSettingsMutation.mutate(newSettings);
-              }}
             />
           </ButtonGroup>
         </ModalFooter>
