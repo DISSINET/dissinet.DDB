@@ -109,19 +109,17 @@ export const Tag: React.FC<TagProps> = ({
   });
 
   useEffect(() => {
-    if (clickedOnce) {
-      const timeout = setTimeout(() => {
-        navigator.clipboard.writeText(label);
-        toast.info(
-          `label [${getShortLabelByLetterCount(
-            label,
-            200
-          )}] copied to clipboard`
-        );
-        setClickedOnce(false);
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
+    if (!clickedOnce) return;
+
+    const timeout = setTimeout(() => {
+      navigator.clipboard.writeText(label);
+      toast.info(
+        `label [${getShortLabelByLetterCount(label, 200)}] copied to clipboard`
+      );
+      setClickedOnce(false);
+    }, 500);
+
+    return () => clearTimeout(timeout);
   }, [clickedOnce]);
 
   const renderTag = useMemo(() => {
@@ -223,6 +221,7 @@ export const Tag: React.FC<TagProps> = ({
       }}
       onDoubleClick={(e) => {
         e.stopPropagation();
+        setClickedOnce(false);
         !disableDoubleClick && appendDetailId(propId);
       }}
     >
