@@ -222,6 +222,11 @@ export namespace EntityEnums {
     German = "deu",
     Spanish = "spa",
     Hungarian = "hun",
+    Polish = "pol",
+    Portuguese = "por",
+    Dutch = "dut",
+    Chinese = "chi",
+    Japanese = "jpn",
   }
 
   export enum ResourceType {

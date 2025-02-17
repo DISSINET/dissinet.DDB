@@ -12,4 +12,9 @@ export const languageDict = [
   { label: "German", value: EntityEnums.Language.German },
   { label: "Spanish", value: EntityEnums.Language.Spanish },
   { label: "Hungarian", value: EntityEnums.Language.Hungarian },
+  { label: "Polish", value: EntityEnums.Language.Polish },
+  { label: "Portuguese", value: EntityEnums.Language.Portuguese },
+  { label: "Dutch", value: EntityEnums.Language.Dutch },
+  { label: "Chinese", value: EntityEnums.Language.Chinese },
+  { label: "Japanese", value: EntityEnums.Language.Japanese },
 ];
