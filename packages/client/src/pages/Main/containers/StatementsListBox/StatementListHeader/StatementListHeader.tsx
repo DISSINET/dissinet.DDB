@@ -427,6 +427,7 @@ export const StatementListHeader: React.FC<StatementListHeader> = ({
                   <Button
                     icon={<TbHomeMove size={14} />}
                     onClick={() => setShowTActionModal(true)}
+                    tooltipLabel="move or duplicate current territory"
                   />
                 }
               />
