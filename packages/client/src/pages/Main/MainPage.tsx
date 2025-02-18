@@ -95,6 +95,23 @@ const MainPage: React.FC<MainPage> = ({}) => {
     />
   );
 
+  const [hideDetailBox, setHideDetailBox] = useState(false);
+
+  const hideDetailBoxButton = () => {
+    return (
+      <>
+        <Button
+          tooltipLabel={
+            hideDetailBox ? "open detail box" : "minimize detail box"
+          }
+          inverted
+          icon={hideDetailBox ? <BiShow /> : <BiHide />}
+          onClick={() => setHideDetailBox(!hideDetailBox)}
+        />
+      </>
+    );
+  };
+
   const toggleThirdPanel = () => {
     if (thirdPanelExpanded) {
       dispatch(setThirdPanelExpanded(false));
@@ -132,7 +149,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
     />
   );
 
-  const handleHideBoxButtonClick = (
+  const handleHideFourthPanelBoxButtonClick = (
     boxToHide: FourthPanelBoxes,
     isThisBoxHidden: boolean
   ) => {
@@ -153,7 +170,8 @@ const MainPage: React.FC<MainPage> = ({}) => {
     }
   };
 
-  const hideBoxButton = (boxToHide: FourthPanelBoxes) => {
+  // hide one of the boxes in fourth panel
+  const hideFourthPanelBoxButton = (boxToHide: FourthPanelBoxes) => {
     const isThisBoxHidden = !fourthPanelBoxesOpened[boxToHide];
     return (
       <>
@@ -162,12 +180,15 @@ const MainPage: React.FC<MainPage> = ({}) => {
             key={boxToHide}
             inverted
             icon={isThisBoxHidden ? <BiShow /> : <BiHide />}
-            onClick={() => handleHideBoxButtonClick(boxToHide, isThisBoxHidden)}
+            onClick={() =>
+              handleHideFourthPanelBoxButtonClick(boxToHide, isThisBoxHidden)
+            }
           />
         )}
       </>
     );
   };
+
   const refreshBoxButton = (
     queriesToRefresh: string[],
     isThisBoxHidden: boolean
@@ -284,6 +305,23 @@ const MainPage: React.FC<MainPage> = ({}) => {
     enabled: !!userId && api.isLoggedIn(),
   });
 
+  const getStatementListBoxHeight = () => {
+    if (!detailIdArray.length) {
+      return contentHeight;
+    } else {
+      // detail is open - 3 states
+      if (statementListOpened) {
+        if (hideDetailBox) {
+          return contentHeight - hiddenBoxHeight;
+        } else {
+          return contentHeight / 2 - 20;
+        }
+      } else {
+        return hiddenBoxHeight;
+      }
+    }
+  };
+
   return (
     <>
       <ScrollHandler />
@@ -324,13 +362,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
           onHeaderClick={
             !statementListOpened ? toggleStatementListOpen : undefined
           }
-          height={
-            detailIdArray.length
-              ? statementListOpened
-                ? contentHeight / 2 - 20
-                : hiddenBoxHeight
-              : contentHeight
-          }
+          height={getStatementListBoxHeight()}
           buttons={[
             <>
               {statementListOpened &&
@@ -372,7 +404,9 @@ const MainPage: React.FC<MainPage> = ({}) => {
             onHeaderClick={toggleStatementListOpen}
             height={
               statementListOpened
-                ? contentHeight / 2 + 20
+                ? hideDetailBox
+                  ? hiddenBoxHeight
+                  : contentHeight / 2 + 20
                 : contentHeight - hiddenBoxHeight
             }
             buttons={[
@@ -402,6 +436,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
                 }
                 onClick={toggleStatementListOpen}
               />,
+              hideDetailBoxButton(),
               <Button
                 inverted
                 tooltipLabel="close all tabs"
@@ -464,7 +499,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
               ["search-templates", "search"],
               !fourthPanelExpanded
             ),
-            hideBoxButton("search"),
+            hideFourthPanelBoxButton("search"),
             hideFourthPanelButton(),
           ]}
           onHeaderClick={toggleFourthPanel}
@@ -479,7 +514,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
           isExpanded={fourthPanelExpanded}
           buttons={[
             refreshBoxButton(["bookmarks"], !fourthPanelExpanded),
-            hideBoxButton("bookmarks"),
+            hideFourthPanelBoxButton("bookmarks"),
             hideFourthPanelButton(),
           ]}
           onHeaderClick={toggleFourthPanel}
@@ -494,7 +529,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
           isExpanded={fourthPanelExpanded}
           buttons={[
             refreshBoxButton(["templates"], !fourthPanelExpanded),
-            hideBoxButton("templates"),
+            hideFourthPanelBoxButton("templates"),
             hideFourthPanelButton(),
           ]}
           onHeaderClick={toggleFourthPanel}
