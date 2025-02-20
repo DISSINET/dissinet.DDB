@@ -13,6 +13,9 @@ import { useAppSelector } from "redux/hooks";
 interface EntityDetailBox {}
 export const EntityDetailBox: React.FC<EntityDetailBox> = ({}) => {
   const ping: number = useAppSelector((state) => state.ping);
+  const detailBoxMinimized: boolean = useAppSelector(
+    (state) => state.layout.detailBoxMinimized
+  );
 
   const {
     detailIdArray,
@@ -95,10 +98,14 @@ export const EntityDetailBox: React.FC<EntityDetailBox> = ({}) => {
   // delay of show content for fluent animation on open
   const [showContent, setShowContent] = useState(false);
   useEffect(() => {
-    setTimeout(() => {
-      setShowContent(true);
-    }, 800);
-  }, []);
+    if (!detailBoxMinimized) {
+      setTimeout(() => {
+        setShowContent(true);
+      }, 800);
+    } else {
+      setShowContent(false);
+    }
+  }, [detailBoxMinimized]);
 
   const {
     status,
@@ -116,7 +123,7 @@ export const EntityDetailBox: React.FC<EntityDetailBox> = ({}) => {
 
   return (
     <>
-      {showContent && (
+      {(showContent || detailBoxMinimized) && (
         <StyledTabGroup>
           {entities &&
             entities.length > 0 &&
@@ -137,16 +144,22 @@ export const EntityDetailBox: React.FC<EntityDetailBox> = ({}) => {
         </StyledTabGroup>
       )}
 
-      {selectedDetailId && showContent && entity ? (
-        <EntityDetail
-          detailId={selectedDetailId}
-          entity={entity}
-          error={entityError}
-          isFetching={isFetching}
-        />
-      ) : (
-        <>{(ping === -10 || ping >= 0) && <Loader show />}</>
-      )}
+      <>
+        {selectedDetailId && showContent && entity ? (
+          <EntityDetail
+            detailId={selectedDetailId}
+            entity={entity}
+            error={entityError}
+            isFetching={isFetching}
+          />
+        ) : (
+          <>
+            {(ping === -10 || ping >= 0) && !detailBoxMinimized && (
+              <Loader show />
+            )}
+          </>
+        )}
+      </>
     </>
   );
 };

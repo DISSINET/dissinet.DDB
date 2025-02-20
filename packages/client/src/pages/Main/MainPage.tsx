@@ -34,6 +34,7 @@ import { MemoizedStatementEditorBox } from "./containers/StatementEditorBox/Stat
 import { MemoizedStatementListBox } from "./containers/StatementsListBox/StatementListBox";
 import { MemoizedTemplateListBox } from "./containers/TemplateListBox/TemplateListBox";
 import { MemoizedTerritoryTreeBox } from "./containers/TerritoryTreeBox/TerritoryTreeBox";
+import { setDetailBoxMinimized } from "redux/features/layout/detailBoxMinimizedSlice";
 
 type FourthPanelBoxes = "search" | "bookmarks" | "templates";
 
@@ -76,6 +77,9 @@ const MainPage: React.FC<MainPage> = ({}) => {
   );
   const statementListOpened: boolean = useAppSelector(
     (state) => state.layout.statementListOpened
+  );
+  const detailBoxMinimized: boolean = useAppSelector(
+    (state) => state.layout.detailBoxMinimized
   );
 
   const toggleFirstPanel = () => {
@@ -307,9 +311,21 @@ const MainPage: React.FC<MainPage> = ({}) => {
         localStorage.setItem("statementListOpened", "false");
       }
     } else {
+      // detail box is not full height
       if (!statementListOpened) {
         dispatch(setStatementListOpened(true));
         localStorage.setItem("statementListOpened", "true");
+      }
+    }
+    if (detailBoxState === DetailBoxState.Minimized) {
+      if (!detailBoxMinimized) {
+        dispatch(setDetailBoxMinimized(true));
+        localStorage.setItem("detailBoxMinimized", "true");
+      }
+    } else {
+      if (detailBoxMinimized) {
+        dispatch(setDetailBoxMinimized(false));
+        localStorage.setItem("detailBoxMinimized", "false");
       }
     }
   }, [detailBoxState]);
@@ -361,7 +377,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
       case DetailBoxState.Normal:
         return contentHeight / 2 + 20;
       case DetailBoxState.Minimized:
-        return hiddenBoxHeight + 23;
+        return hiddenBoxHeight + 22;
     }
   };
 
