@@ -423,3 +423,9 @@ export enum ButtonSize {
   Medium = "M",
   Large = "L",
 }
+
+export enum DetailBoxState {
+  Minimized = "minimized",
+  Normal = "normal",
+  FullHeight = "fullHeight",
+}

@@ -1,12 +1,15 @@
 import { EntityEnums, UserEnums } from "@shared/enums";
+import { IStatement } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   collapsedPanelWidth,
   fourthPanelBoxesHeightThirds,
   hiddenBoxHeight,
 } from "Theme/constants";
+import api from "api";
 import { Box, Button, Panel } from "components";
 import { EntityCreateModal, PanelSeparator } from "components/advanced";
+import { CStatement } from "constructors";
 import { useSearchParams } from "hooks";
 import ScrollHandler from "hooks/ScrollHandler";
 import React, { useEffect, useState } from "react";
@@ -19,7 +22,11 @@ import { setFirstPanelExpanded } from "redux/features/layout/firstPanelExpandedS
 import { setFourthPanelBoxesOpened } from "redux/features/layout/fourthPanelBoxesOpenedSlice";
 import { setFourthPanelExpanded } from "redux/features/layout/fourthPanelExpandedSlice";
 import { setStatementListOpened } from "redux/features/layout/statementListOpenedSlice";
+import { setThirdPanelExpanded } from "redux/features/layout/thirdPanelExpandedSlice";
+import { setDisableStatementListScroll } from "redux/features/statementList/disableStatementListScrollSlice";
+import { setIsLoading } from "redux/features/statementList/isLoadingSlice";
 import { useAppDispatch, useAppSelector } from "redux/hooks";
+import { DetailBoxState } from "types";
 import { MemoizedEntityBookmarkBox } from "./containers/EntityBookmarkBox/EntityBookmarkBox";
 import { MemoizedEntityDetailBox } from "./containers/EntityDetailBox/EntityDetailBox";
 import { MemoizedEntitySearchBox } from "./containers/EntitySearchBox/EntitySearchBox";
@@ -27,12 +34,7 @@ import { MemoizedStatementEditorBox } from "./containers/StatementEditorBox/Stat
 import { MemoizedStatementListBox } from "./containers/StatementsListBox/StatementListBox";
 import { MemoizedTemplateListBox } from "./containers/TemplateListBox/TemplateListBox";
 import { MemoizedTerritoryTreeBox } from "./containers/TerritoryTreeBox/TerritoryTreeBox";
-import api from "api";
-import { IStatement } from "@shared/types";
-import { setDisableStatementListScroll } from "redux/features/statementList/disableStatementListScrollSlice";
-import { CStatement } from "constructors";
-import { setIsLoading } from "redux/features/statementList/isLoadingSlice";
-import { setThirdPanelExpanded } from "redux/features/layout/thirdPanelExpandedSlice";
+import { setDetailBoxMinimized } from "redux/features/layout/detailBoxMinimizedSlice";
 
 type FourthPanelBoxes = "search" | "bookmarks" | "templates";
 
@@ -75,6 +77,9 @@ const MainPage: React.FC<MainPage> = ({}) => {
   );
   const statementListOpened: boolean = useAppSelector(
     (state) => state.layout.statementListOpened
+  );
+  const detailBoxMinimized: boolean = useAppSelector(
+    (state) => state.layout.detailBoxMinimized
   );
 
   const toggleFirstPanel = () => {
@@ -132,7 +137,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
     />
   );
 
-  const handleHideBoxButtonClick = (
+  const handleHideFourthPanelBoxButtonClick = (
     boxToHide: FourthPanelBoxes,
     isThisBoxHidden: boolean
   ) => {
@@ -153,7 +158,8 @@ const MainPage: React.FC<MainPage> = ({}) => {
     }
   };
 
-  const hideBoxButton = (boxToHide: FourthPanelBoxes) => {
+  // hide one of the boxes in fourth panel
+  const hideFourthPanelBoxButton = (boxToHide: FourthPanelBoxes) => {
     const isThisBoxHidden = !fourthPanelBoxesOpened[boxToHide];
     return (
       <>
@@ -162,12 +168,15 @@ const MainPage: React.FC<MainPage> = ({}) => {
             key={boxToHide}
             inverted
             icon={isThisBoxHidden ? <BiShow /> : <BiHide />}
-            onClick={() => handleHideBoxButtonClick(boxToHide, isThisBoxHidden)}
+            onClick={() =>
+              handleHideFourthPanelBoxButtonClick(boxToHide, isThisBoxHidden)
+            }
           />
         )}
       </>
     );
   };
+
   const refreshBoxButton = (
     queriesToRefresh: string[],
     isThisBoxHidden: boolean
@@ -237,13 +246,6 @@ const MainPage: React.FC<MainPage> = ({}) => {
 
   const [showEntityCreateModal, setShowEntityCreateModal] = useState(false);
 
-  const toggleStatementListOpen = () => {
-    statementListOpened
-      ? localStorage.setItem("statementListOpened", "false")
-      : localStorage.setItem("statementListOpened", "true");
-    dispatch(setStatementListOpened(!statementListOpened));
-  };
-
   const userRole = localStorage.getItem("userrole") as UserEnums.Role;
 
   const addStatementAtTheEndMutation = useMutation({
@@ -284,6 +286,114 @@ const MainPage: React.FC<MainPage> = ({}) => {
     enabled: !!userId && api.isLoggedIn(),
   });
 
+  const getStatementListBoxHeight = () => {
+    if (!detailIdArray.length) {
+      return contentHeight;
+    } else {
+      switch (detailBoxState) {
+        case DetailBoxState.FullHeight:
+          return hiddenBoxHeight;
+        case DetailBoxState.Normal:
+          return contentHeight / 2 + 20;
+        case DetailBoxState.Minimized:
+          return contentHeight - hiddenBoxHeight;
+      }
+    }
+  };
+
+  const [detailBoxState, setDetailBoxState] = useState(
+    detailBoxMinimized ? DetailBoxState.Minimized : DetailBoxState.Normal
+  );
+  const [lastState, setLastState] = useState(DetailBoxState.Normal);
+
+  useEffect(() => {
+    if (detailBoxState === DetailBoxState.FullHeight) {
+      if (statementListOpened) {
+        dispatch(setStatementListOpened(false));
+        localStorage.setItem("statementListOpened", "false");
+      }
+    } else {
+      // detail box is not full height
+      if (!statementListOpened) {
+        dispatch(setStatementListOpened(true));
+        localStorage.setItem("statementListOpened", "true");
+      }
+    }
+    if (detailBoxState === DetailBoxState.Minimized) {
+      if (!detailBoxMinimized) {
+        dispatch(setDetailBoxMinimized(true));
+        localStorage.setItem("detailBoxMinimized", "true");
+      }
+    } else {
+      if (detailBoxMinimized) {
+        dispatch(setDetailBoxMinimized(false));
+        localStorage.setItem("detailBoxMinimized", "false");
+      }
+    }
+  }, [detailBoxState]);
+
+  const handleMaximizeDetailBox = () => {
+    if (detailBoxState === DetailBoxState.Normal) {
+      setDetailBoxState(DetailBoxState.FullHeight);
+    } else {
+      setDetailBoxState(DetailBoxState.Normal);
+    }
+  };
+
+  const handleMinimizeDetailBox = () => {
+    if (detailBoxState === DetailBoxState.Minimized) {
+      setDetailBoxState(lastState);
+    } else {
+      setLastState(detailBoxState);
+      setDetailBoxState(DetailBoxState.Minimized);
+    }
+  };
+
+  const minimizeDetailBoxButton = () => {
+    return (
+      <>
+        <Button
+          tooltipLabel={
+            detailBoxState === DetailBoxState.Minimized
+              ? "open detail box"
+              : "minimize detail box"
+          }
+          inverted
+          icon={
+            detailBoxState === DetailBoxState.Minimized ? (
+              <BiShow />
+            ) : (
+              <BiHide />
+            )
+          }
+          onClick={handleMinimizeDetailBox}
+        />
+      </>
+    );
+  };
+
+  const getDetailBoxHeight = () => {
+    switch (detailBoxState) {
+      case DetailBoxState.FullHeight:
+        return contentHeight - hiddenBoxHeight;
+      case DetailBoxState.Normal:
+        return contentHeight / 2 + 20;
+      case DetailBoxState.Minimized:
+        return hiddenBoxHeight + 22;
+    }
+  };
+
+  const getMaximizeBtnTooltip = () => {
+    switch (detailBoxState) {
+      case DetailBoxState.FullHeight:
+        return "shrink detail box";
+      case DetailBoxState.Normal:
+        return "maximize detail box";
+      case DetailBoxState.Minimized:
+        return "open detail box";
+    }
+  };
+
   return (
     <>
       <ScrollHandler />
@@ -322,15 +432,9 @@ const MainPage: React.FC<MainPage> = ({}) => {
           label="Statements"
           borderColor="white"
           onHeaderClick={
-            !statementListOpened ? toggleStatementListOpen : undefined
+            DetailBoxState.FullHeight ? handleMaximizeDetailBox : undefined
           }
-          height={
-            detailIdArray.length
-              ? statementListOpened
-                ? contentHeight / 2 - 20
-                : hiddenBoxHeight
-              : contentHeight
-          }
+          height={getStatementListBoxHeight()}
           buttons={[
             <>
               {statementListOpened &&
@@ -369,12 +473,8 @@ const MainPage: React.FC<MainPage> = ({}) => {
           <Box
             label="Detail"
             borderColor="white"
-            onHeaderClick={toggleStatementListOpen}
-            height={
-              statementListOpened
-                ? contentHeight / 2 + 20
-                : contentHeight - hiddenBoxHeight
-            }
+            onHeaderClick={handleMaximizeDetailBox}
+            height={getDetailBoxHeight()}
             buttons={[
               <>
                 {userRole !== UserEnums.Role.Viewer && (
@@ -388,20 +488,17 @@ const MainPage: React.FC<MainPage> = ({}) => {
               refreshBoxButton(["entity", "user"], false),
               <Button
                 inverted
-                tooltipLabel={
-                  statementListOpened
-                    ? "maximize detail box"
-                    : "shrink detail box"
-                }
+                tooltipLabel={getMaximizeBtnTooltip()}
                 icon={
-                  statementListOpened ? (
+                  detailBoxState === DetailBoxState.Normal ? (
                     <BsSquareFill />
                   ) : (
                     <BsSquareHalf style={{ transform: "rotate(270deg)" }} />
                   )
                 }
-                onClick={toggleStatementListOpen}
+                onClick={handleMaximizeDetailBox}
               />,
+              minimizeDetailBoxButton(),
               <Button
                 inverted
                 tooltipLabel="close all tabs"
@@ -409,6 +506,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
                 onClick={() => {
                   clearAllDetailIds();
                   dispatch(setStatementListOpened(true));
+                  setDetailBoxState(DetailBoxState.Normal);
                 }}
               />,
             ]}
@@ -464,7 +562,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
               ["search-templates", "search"],
               !fourthPanelExpanded
             ),
-            hideBoxButton("search"),
+            hideFourthPanelBoxButton("search"),
             hideFourthPanelButton(),
           ]}
           onHeaderClick={toggleFourthPanel}
@@ -479,7 +577,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
           isExpanded={fourthPanelExpanded}
           buttons={[
             refreshBoxButton(["bookmarks"], !fourthPanelExpanded),
-            hideBoxButton("bookmarks"),
+            hideFourthPanelBoxButton("bookmarks"),
             hideFourthPanelButton(),
           ]}
           onHeaderClick={toggleFourthPanel}
@@ -494,7 +592,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
           isExpanded={fourthPanelExpanded}
           buttons={[
             refreshBoxButton(["templates"], !fourthPanelExpanded),
-            hideBoxButton("templates"),
+            hideFourthPanelBoxButton("templates"),
             hideFourthPanelButton(),
           ]}
           onHeaderClick={toggleFourthPanel}
