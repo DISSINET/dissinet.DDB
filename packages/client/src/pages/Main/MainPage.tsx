@@ -320,9 +320,9 @@ const MainPage: React.FC<MainPage> = ({}) => {
 
   const handleMinimizeDetailBox = () => {
     if (detailBoxState === DetailBoxState.Minimized) {
-      setDetailBoxState(lastState); // Restore last state when already minimized
+      setDetailBoxState(lastState);
     } else {
-      setLastState(detailBoxState); // Save last state before changing
+      setLastState(detailBoxState);
       setDetailBoxState(DetailBoxState.Minimized);
     }
   };
