@@ -242,13 +242,20 @@ export class SearchQuery {
     const [label, leftWildcard, rightWildcard] = this.prepareLabel(labelOrId);
     this.usedLabel = label;
 
+    // replace regexp chars
+    let escapedLabelOrId = labelOrId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // frontend adds one final asterisk for labelOrId - we need to retain it there
+    const hasEscapedAsteriskAtEnd = escapedLabelOrId.endsWith('\\*');
+    if (hasEscapedAsteriskAtEnd) {
+      escapedLabelOrId = escapedLabelOrId.slice(0, -2) + '*';
+    }
+
     this.query = this.query.filter(function (row: RDatum) {
       return r.or(
-        // row("labels").contains<string>((label) =>
-        //   label.downcase().match(label)
-        // ),
-        SearchQuery.searchWordByWord(row, label, leftWildcard, rightWildcard),
-        row("id").match(labelOrId.replace("*", "")).ne(null)
+        SearchQuery.searchWordByWord(row, escapedLabel, leftWildcard, rightWildcard),
+        row("id").match(escapedLabelOrId).ne(null)
       );
     });
 
