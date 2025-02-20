@@ -301,7 +301,9 @@ const MainPage: React.FC<MainPage> = ({}) => {
     }
   };
 
-  const [detailBoxState, setDetailBoxState] = useState(DetailBoxState.Normal);
+  const [detailBoxState, setDetailBoxState] = useState(
+    detailBoxMinimized ? DetailBoxState.Minimized : DetailBoxState.Normal
+  );
   const [lastState, setLastState] = useState(DetailBoxState.Normal);
 
   useEffect(() => {
