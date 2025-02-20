@@ -77,9 +77,6 @@ const MainPage: React.FC<MainPage> = ({}) => {
   const statementListOpened: boolean = useAppSelector(
     (state) => state.layout.statementListOpened
   );
-  const detailBoxHidden: boolean = useAppSelector(
-    (state) => state.layout.detailBoxHidden
-  );
 
   const toggleFirstPanel = () => {
     if (firstPanelExpanded) {
@@ -245,13 +242,6 @@ const MainPage: React.FC<MainPage> = ({}) => {
 
   const [showEntityCreateModal, setShowEntityCreateModal] = useState(false);
 
-  // const toggleStatementListOpen = () => {
-  //   statementListOpened
-  //     ? localStorage.setItem("statementListOpened", "false")
-  //     : localStorage.setItem("statementListOpened", "true");
-  //   dispatch(setStatementListOpened(!statementListOpened));
-  // };
-
   const userRole = localStorage.getItem("userrole") as UserEnums.Role;
 
   const addStatementAtTheEndMutation = useMutation({
@@ -310,6 +300,20 @@ const MainPage: React.FC<MainPage> = ({}) => {
   const [detailBoxState, setDetailBoxState] = useState(DetailBoxState.Normal);
   const [lastState, setLastState] = useState(DetailBoxState.Normal);
 
+  useEffect(() => {
+    if (detailBoxState === DetailBoxState.FullHeight) {
+      if (statementListOpened) {
+        dispatch(setStatementListOpened(false));
+        localStorage.setItem("statementListOpened", "false");
+      }
+    } else {
+      if (!statementListOpened) {
+        dispatch(setStatementListOpened(true));
+        localStorage.setItem("statementListOpened", "true");
+      }
+    }
+  }, [detailBoxState]);
+
   const handleMaximizeDetailBox = () => {
     if (detailBoxState === DetailBoxState.Normal) {
       setDetailBoxState(DetailBoxState.FullHeight);
@@ -350,9 +354,6 @@ const MainPage: React.FC<MainPage> = ({}) => {
     );
   };
 
-  // statementListOpened is for scrollTo and show the statements
-  // const statementListOpened = DetailBoxState.Normal || DetailBoxState.Minimized;
-
   const getDetailBoxHeight = () => {
     switch (detailBoxState) {
       case DetailBoxState.FullHeight:
@@ -361,6 +362,17 @@ const MainPage: React.FC<MainPage> = ({}) => {
         return contentHeight / 2 + 20;
       case DetailBoxState.Minimized:
         return hiddenBoxHeight + 23;
+    }
+  };
+
+  const getMaximizeBtnTooltip = () => {
+    switch (detailBoxState) {
+      case DetailBoxState.FullHeight:
+        return "shrink detail box";
+      case DetailBoxState.Normal:
+        return "maximize detail box";
+      case DetailBoxState.Minimized:
+        return "open detail box";
     }
   };
 
@@ -458,21 +470,7 @@ const MainPage: React.FC<MainPage> = ({}) => {
               refreshBoxButton(["entity", "user"], false),
               <Button
                 inverted
-                tooltipLabel={
-                  ""
-                  // switch(detailBoxState) {
-                  //   case DetailBoxState.FullHeight:
-                  //     return "shrink detail box";
-                  //   case DetailBoxState.Normal:
-                  //     return "maximize detail box";
-                  //   case DetailBoxState.Minimized:
-                  //     return "open detail box";
-                  // }
-
-                  // detailBoxState !== DetailBoxState.FullHeight
-                  //   ? "maximize detail box"
-                  //   : "shrink detail box"
-                }
+                tooltipLabel={getMaximizeBtnTooltip()}
                 icon={
                   detailBoxState === DetailBoxState.Normal ? (
                     <BsSquareFill />
