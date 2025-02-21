@@ -3,9 +3,9 @@ import {
   conceptPartOfSpeechDict,
   languageDict,
 } from "@shared/dictionaries";
-import { classesAll } from "@shared/dictionaries/entity";
+import { classesAll, entitiesDictKeys } from "@shared/dictionaries/entity";
 import { EntityEnums, UserEnums } from "@shared/enums";
-import { IEntity } from "@shared/types";
+import { IEntity, ITerritory } from "@shared/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   MIN_LABEL_LENGTH_MESSAGE,
@@ -44,6 +44,8 @@ interface EntityCreateModal {
   labelTyped?: string;
   categorySelected?: EntityEnums.Class;
   languageSelected?: EntityEnums.Language;
+  // init for create T / S
+  parentTerritory?: IEntity;
 
   allowedEntityClasses?: EntityEnums.Class[];
 }
@@ -53,6 +55,7 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
   labelTyped = "",
   categorySelected,
   languageSelected,
+  parentTerritory,
   allowedEntityClasses,
 }) => {
   const entityClasses = allowedEntityClasses
@@ -80,7 +83,7 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
     EntityEnums.ConceptPartOfSpeech.Empty
   );
   const [territoryEntity, setTerritoryEntity] = useState<false | IEntity>(
-    false
+    parentTerritory || false
   );
 
   const userId = localStorage.getItem("userid");
@@ -237,7 +240,13 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
       onEnterPress={handleCheckOnSubmit}
       onClose={closeModal}
     >
-      <ModalHeader title="Create entity" />
+      <ModalHeader
+        title={`Create ${
+          entityClasses.length === 1
+            ? entitiesDictKeys[selectedCategory].label
+            : "entity"
+        }`}
+      />
       <ModalContent column>
         <ModalInputForm alignLeft>
           <ModalInputLabel>{"Class & Label: "}</ModalInputLabel>
@@ -333,6 +342,7 @@ export const EntityCreateModal: React.FC<EntityCreateModal> = ({
               <ModalInputWrap>
                 {territoryEntity ? (
                   <EntityTag
+                    fullWidth
                     entity={territoryEntity}
                     tooltipPosition="left"
                     unlinkButton={{
