@@ -16,7 +16,7 @@ export const StyledModalWrap = styled.div<ModalWrap>`
   left: 0;
   right: 0;
   top: 0;
-  z-index: 40;
+  z-index: 150;
 `;
 export const StyledBackground = styled(animated.div)`
   position: absolute;
@@ -54,7 +54,7 @@ export const StyledCard = styled(animated.div)<Card>`
   flex-direction: column;
   margin: ${({ theme }) => `0 ${theme.space[8]}`};
   max-height: calc(100vh - 8rem);
-  z-index: 50;
+  z-index: 155;
   background-color: ${({ theme }) => theme.color["gray"][100]};
   color: ${({ theme }) => theme.color["black"]};
   border-radius: ${({ theme }) => theme.borderRadius["sm"]};
