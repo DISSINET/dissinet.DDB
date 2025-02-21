@@ -54,7 +54,7 @@ export const StyledCard = styled(animated.div)<Card>`
   flex-direction: column;
   margin: ${({ theme }) => `0 ${theme.space[8]}`};
   max-height: calc(100vh - 8rem);
-  z-index: 50;
+  z-index: 155;
   background-color: ${({ theme }) => theme.color["gray"][100]};
   color: ${({ theme }) => theme.color["black"]};
   border-radius: ${({ theme }) => theme.borderRadius["sm"]};
