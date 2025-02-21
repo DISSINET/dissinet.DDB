@@ -170,7 +170,7 @@ export const ModalInputForm: React.FC<ModalInputForm> = ({
   alignLeft = false,
 }) => {
   return (
-    <StyledModalInputForm alignLeft={alignLeft}>
+    <StyledModalInputForm $alignLeft={alignLeft}>
       {children}
     </StyledModalInputForm>
   );
