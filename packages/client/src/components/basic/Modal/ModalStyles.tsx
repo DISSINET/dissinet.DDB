@@ -16,7 +16,7 @@ export const StyledModalWrap = styled.div<ModalWrap>`
   left: 0;
   right: 0;
   top: 0;
-  z-index: 40;
+  z-index: 150;
 `;
 export const StyledBackground = styled(animated.div)`
   position: absolute;
