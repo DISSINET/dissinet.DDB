@@ -1,9 +1,9 @@
-import { UserEnums } from "@shared/enums";
+import { EntityEnums, UserEnums } from "@shared/enums";
 import { IResponseTree, IUser } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { rootTerritoryId } from "Theme/constants";
 import api from "api";
 import { Button, ButtonGroup, CustomScrollbar, Loader } from "components";
+import { EntityCreateModal } from "components/advanced";
 import { useSearchParams } from "hooks";
 import React, { useEffect, useState } from "react";
 import { BsFilter } from "react-icons/bs";
@@ -14,7 +14,6 @@ import { setTreeInitialized } from "redux/features/territoryTree/treeInitializeS
 import { useAppDispatch, useAppSelector } from "redux/hooks";
 import { ITerritoryFilter } from "types";
 import { searchTree } from "utils/utils";
-import { ContextMenuNewTerritoryModal } from "./ContextMenuNewTerritoryModal/ContextMenuNewTerritoryModal";
 import { StyledNoResults, StyledTreeWrapper } from "./TerritoryTreeBoxStyles";
 import { TerritoryTreeFilter } from "./TerritoryTreeFilter/TerritoryTreeFilter";
 import {
@@ -258,9 +257,12 @@ export const TerritoryTreeBox: React.FC = () => {
       )}
 
       {showCreate && (
-        <ContextMenuNewTerritoryModal
-          onClose={() => setShowCreate(false)}
-          territoryActantId={rootTerritoryId}
+        <EntityCreateModal
+          closeModal={() => setShowCreate(false)}
+          allowedEntityClasses={[EntityEnums.Class.Territory]}
+          onMutationSuccess={() =>
+            queryClient.invalidateQueries({ queryKey: ["tree"] })
+          }
         />
       )}
       <Loader show={isFetching || updateUserMutation.isPending} />

@@ -1,18 +1,18 @@
 import { FloatingPortal, autoUpdate, useFloating } from "@floating-ui/react";
 import { config, useSpring } from "@react-spring/web";
-import { UserEnums } from "@shared/enums";
+import { EntityEnums, UserEnums } from "@shared/enums";
 import { IEntity, IUser } from "@shared/types";
-import { UseMutationResult } from "@tanstack/react-query";
+import { UseMutationResult, useQueryClient } from "@tanstack/react-query";
 import { Button } from "components";
 import React, { useEffect, useState } from "react";
 import { FaPlus, FaStar, FaTrashAlt } from "react-icons/fa";
-import { ContextMenuNewTerritoryModal } from "../ContextMenuNewTerritoryModal/ContextMenuNewTerritoryModal";
 import { ContextMenuSubmitDelete } from "../ContextMenuSubmitDelete/ContextMenuSubmitDelete";
 import {
   StyledCgMenuBoxed,
   StyledContextButtonGroup,
   StyledWrapper,
 } from "./TerritoryTreeContextMenuStyles";
+import { EntityCreateModal } from "components/advanced";
 
 interface TerritoryTreeContextMenu {
   territoryActant: IEntity;
@@ -57,6 +57,8 @@ export const TerritoryTreeContextMenu: React.FC<TerritoryTreeContextMenu> = ({
       }, 300);
     }
   }, [showMenu]);
+
+  const queryClient = useQueryClient();
 
   return (
     <>
@@ -165,9 +167,13 @@ export const TerritoryTreeContextMenu: React.FC<TerritoryTreeContextMenu> = ({
         />
       )}
       {showCreate && (
-        <ContextMenuNewTerritoryModal
-          onClose={() => setShowCreate(false)}
-          territoryActantId={territoryActant.id}
+        <EntityCreateModal
+          closeModal={() => setShowCreate(false)}
+          allowedEntityClasses={[EntityEnums.Class.Territory]}
+          onMutationSuccess={() =>
+            queryClient.invalidateQueries({ queryKey: ["tree"] })
+          }
+          parentTerritory={territoryActant}
         />
       )}
     </>
