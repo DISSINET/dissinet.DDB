@@ -92,6 +92,7 @@ export const TerritoryTreeBox: React.FC = () => {
   });
 
   const userRole = localStorage.getItem("userrole");
+  console.log(userRole);
   const { territoryId } = useSearchParams();
   const [showCreate, setShowCreate] = useState(false);
 
@@ -187,7 +188,8 @@ export const TerritoryTreeBox: React.FC = () => {
   return (
     <>
       <ButtonGroup>
-        {userRole === UserEnums.RoleMode.Admin && (
+        {(userRole === UserEnums.Role.Admin ||
+          userRole === UserEnums.Role.Owner) && (
           <Button
             label="new"
             iconRight={<span style={{ marginLeft: 5 }}>{"\u0054"}</span>}
