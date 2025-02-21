@@ -662,8 +662,9 @@ export default class Keys {
                 );
               }
             } else if (this.text.mode === EditMode.SEMI) {
-              // TODO https://github.com/DISSINET/InkVisitor/issues/2193
-              // needs to translate selection bounds to absolute bounds...
+              // ctrl + x in semi mode - copy text and delete it
+              this.annotator.onCopyText();
+              this.onKeyDelete(e);
             }
           } else if (e.key === "a") {
             this.cursor.selectStart = {

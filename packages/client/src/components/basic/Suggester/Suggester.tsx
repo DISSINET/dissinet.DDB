@@ -45,7 +45,6 @@ import {
 import {
   MemoizedEntityRow,
   SuggestionRowEntityItemData,
-  createItemData,
 } from "./SuggestionRow/SuggestionRow";
 
 interface Suggester {
