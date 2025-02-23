@@ -41,7 +41,9 @@ export class ResponseStatement extends Statement implements IResponseStatement {
   async prepare(req: IRequest) {
     this.right = this.getUserRoleMode(req.getUserOrFail());
     await this.prepareEntities(req.db.connection);
-    this.warnings = await this.getWarnings(req);
+    if (!this.usedTemplate) {
+      this.warnings = await this.getWarnings(req);
+    }
   }
 
   /**
