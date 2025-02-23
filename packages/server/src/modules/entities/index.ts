@@ -205,7 +205,7 @@ export default Router()
         throw new InternalServerError("cannot create entity");
       }
 
-      const out: IResponseGeneric = { result: true };
+      const out: IResponseGeneric = { result: true, data: model };
 
       if (model.usedTemplate) {
         await model.applyTemplate(request, model.usedTemplate);
